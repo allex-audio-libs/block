@@ -1,0 +1,28 @@
+{
+  "name": "allex__audio_blocklib",
+  "version": "1.0.0",
+  "description": "AllexJS implementation of an Audio Block",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allex-audio-libs/block.git"
+  },
+  "dependencies": {
+    "speaker": "^0.5.4"
+  },
+  "keywords": [
+    "ecosystem:AllexJS",
+    "audio",
+    "block",
+    "lib"
+  ],
+  "author": "Nadezdin Brat <razgar02@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/allex-audio-libs/block/issues"
+  },
+  "homepage": "https://github.com/allex-audio-libs/block#readme"
+}
