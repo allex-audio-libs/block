@@ -16,7 +16,7 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     require('./sawgenerator')(lib, mylib);
     require('./squaregenerator')(lib, mylib);
     
-    require('./mathcreator')(lib, mylib);
+    require('./mathcreator')(lib, templateslib, mylib);
 
     require('./diagramcreator')(lib, mylib);
 

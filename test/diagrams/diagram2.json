@@ -12,7 +12,13 @@
             "FrequencyHz": 14
         }
     },{
-        "name": "Sine",
+        "name": "Sine1",
+        "type": "SineGenerator",
+        "options": {
+            "FrequencyHz": 1000                    
+        }
+    },{
+        "name": "Sine2",
         "type": "SineGenerator",
         "options": {
             "FrequencyHz": 1000                    
@@ -34,6 +40,17 @@
         "type": "Multiplier",
         "options": {
             "Math2": 1e-8
+        }
+    },{
+        "name": "OutAttn",
+        "type": "Divider",
+        "options": {
+            "Math2": 2
+        }
+    },{
+        "name": "Adder",
+        "type": "Adder",
+        "options": {
         }
     },{
         "name": "Speaker",
@@ -58,7 +75,16 @@
             "channel": "Clock"
         },
         "in": {
-            "name": "Sine",
+            "name": "Sine1",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Sine2",
             "channel": "Clock"
         }
     },{
@@ -76,7 +102,7 @@
             "channel": "Samples"
         },
         "in": {
-            "name": "Sine",
+            "name": "Sine1",
             "channel": "FrequencyHzModulation"
         }
     },{
@@ -126,8 +152,35 @@
         }
     },{
         "out": {
-            "name": "Sine",
+            "name": "Sine1",
             "channel": "Samples"
+        },
+        "in": {
+            "name": "Adder",
+            "channel": "Math1"
+        }
+    },{
+        "out": {
+            "name": "Sine2",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Adder",
+            "channel": "Math2"
+        }
+    },{
+        "out": {
+            "name": "Adder",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "OutAttn",
+            "channel": "Math1"
+        }
+    },{
+        "out": {
+            "name": "OutAttn",
+            "channel": "Math"
         },
         "in": {
             "name": "Speaker",

@@ -9,7 +9,7 @@ function createBaseGenerator (lib, mylib) {
     function GeneratorBaseBlock () {
         MyBase.call(this);
         ClockListenerMixin.call(this);
-        SamplesEmitterMixin.call(this, 440);
+        SamplesEmitterMixin.call(this, 0);
     }
     lib.inherit(GeneratorBaseBlock, MyBase);
     ClockListenerMixin.addMethods(GeneratorBaseBlock);

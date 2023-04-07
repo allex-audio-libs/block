@@ -12,10 +12,6 @@ function createSineGenerator (lib, mylib) {
     };
     SineGeneratorBlock.prototype.generateSample = function (clockinput) {
         var ret = Math.sin(clockinput*this.naturalFrequency()+this.phase);
-        if (isNaN(ret)) {
-            var dfisnf = this.naturalFrequency();
-            var a = 5;
-        }
         return ret;
     };
 

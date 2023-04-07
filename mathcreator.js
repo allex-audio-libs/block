@@ -1,4 +1,4 @@
-function createMathBlock (lib, mylib) {
+function createMathBlock (lib, templateslib, mylib) {
     'use strict';
 
     var MyBase = mylib.Base;
@@ -36,7 +36,7 @@ function createMathBlock (lib, mylib) {
     };
     mylib.UnaryMath = UnaryMathBlock;
 
-
+    /*
     function MinusOnePlusOneToZeroPlusOneBlock () {
         UnaryMathBlock.call(this);
     }
@@ -45,6 +45,7 @@ function createMathBlock (lib, mylib) {
         return (input+1)/2;
     }
     mylib.MinusOnePlusOneToZeroPlusOne = MinusOnePlusOneToZeroPlusOneBlock;
+    */
 
 
     function BinaryMathBlock () {
@@ -79,6 +80,7 @@ function createMathBlock (lib, mylib) {
     };
     mylib.BinaryMath = BinaryMathBlock;
 
+    /*
     function MultiplierBlock () {
         BinaryMathBlock.call(this);
     }
@@ -86,6 +88,69 @@ function createMathBlock (lib, mylib) {
     MultiplierBlock.prototype.formula = function (input1, input2) {
         return input1*input2;
     };
-    mylib.Multiplier = MultiplierBlock;    
+    mylib.Multiplier = MultiplierBlock;
+    */
+
+    function formulaParamsFromBaseNamePrefix (basenameprefix) {
+        switch (basenameprefix) {
+            case 'Unary':
+                return 'input';
+            case 'Binary':
+                return 'input1, input2';
+            default:
+                throw new lib.Error('BASENAMEPREFIX_NOT_SUPPORTED', basenameprefix+' is not supported yet');
+        }
+    }
+    function createInheritedBlockFormula (basenameprefix, formula) {
+        if (lib.isString(formula)) {
+            return templateslib.process({
+                template: [
+                    'function (PARAMS) {',
+                    '\treturn FORMULA;',
+                    '}'
+                ].join('\n'),
+                replacements: {
+                    PARAMS: formulaParamsFromBaseNamePrefix(basenameprefix),
+                    FORMULA: formula
+                }
+            })
+        }
+        if (lib.isFunction(formula)) {
+            return 'formula';
+        }
+        throw new lib.Error("FORMULA_NOT_SUPPORTED", typeof(formula)+' not supported');
+    }
+    function createInheritedBlock (codename, basenameprefix, formula) {
+        var blockname = codename+'Block';
+        eval(templateslib.process({
+            template: [
+                'function BLOCKNAME () {',
+                '\tBASENAME.call(this);',
+                '}',
+                'lib.inherit(BLOCKNAME, BASENAME);',
+                'BLOCKNAME.prototype.formula = FORMULA;',
+                'mylib.CODENAME = BLOCKNAME;'
+            ].join('\n'),
+            replacements: {
+                CODENAME: codename,
+                BASENAME: basenameprefix+'MathBlock',
+                BLOCKNAME: blockname,
+                FORMULA: createInheritedBlockFormula(basenameprefix, formula)
+            }
+        }))
+    }
+
+    createInheritedBlock('MinusOnePlusOneToZeroPlusOne', 'Unary', '(input+1)/2');
+    createInheritedBlock('Sqrt', 'Unary', 'Math.sqrt(input)');
+    createInheritedBlock('Square', 'Unary', 'input*input');
+    createInheritedBlock('Negative', 'Unary', '-input');
+    createInheritedBlock('Reciprocal', 'Unary', '1/input');
+    createInheritedBlock('Adder', 'Binary', 'input1+input2');
+    createInheritedBlock('Subtractor', 'Binary', 'input1-input2');
+    createInheritedBlock('Multiplier', 'Binary', 'input1*input2');
+    createInheritedBlock('Divider', 'Binary', 'input1/input2');
+    createInheritedBlock('Power', 'Binary', 'input1**input2');
+    createInheritedBlock('Limiter', 'Binary', '(Math.abs(input1)>Math.abs(input2)) ? input2 : input1');
+
 }
 module.exports = createMathBlock;
