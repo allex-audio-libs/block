@@ -2,7 +2,8 @@ function createMathBlock (lib, templateslib, mylib) {
     'use strict';
 
     var MyBase = mylib.Base;
-    var MathEmitterMixin = mylib.mixins.MathEmitter,
+    var ClockListenerMixin = mylib.mixins.ClockListener,
+        MathEmitterMixin = mylib.mixins.MathEmitter,
         MathListenerMixin = mylib.mixins.MathListener,
         Math1EmitterMixin = mylib.mixins.Math1Emitter,
         Math1ListenerMixin = mylib.mixins.Math1Listener,
@@ -14,8 +15,14 @@ function createMathBlock (lib, templateslib, mylib) {
             throw new lib.Error('FORMULA_NOT_A_FUNCTION', this.constructor.name+' must have a formula (Function) in its prototype')
         }
         MyBase.call(this);
+        ClockListenerMixin.call(this);
     }
     lib.inherit(MathBlock, MyBase);
+    ClockListenerMixin.addMethods(UnaryMathBlock);
+    MathBlock.prototype.destroy = function () {
+        ClockListenerMixin.prototype.destroy.call(this);
+        MyBase.prototype.destroy.call(this);
+    };
     MathBlock.prototype.formula = null;
 
     function UnaryMathBlock () {
@@ -31,8 +38,8 @@ function createMathBlock (lib, templateslib, mylib) {
         MathEmitterMixin.prototype.destroy.call(this);
         MathBlock.prototype.destroy.call(this);
     };
-    UnaryMathBlock.prototype.onMathInput = function (input) {
-        this.setMath(this.formula(input));
+    UnaryMathBlock.prototype.onClockInput = function (clock) {
+        this.setMath(this.formula(this.math));
     };
     mylib.UnaryMath = UnaryMathBlock;
 
@@ -70,12 +77,7 @@ function createMathBlock (lib, templateslib, mylib) {
         MathEmitterMixin.prototype.destroy.call(this);
         MathBlock.prototype.destroy.call(this);
     };
-    BinaryMathBlock.prototype.onMath1Input = function (number) {
-        Math1ListenerMixin.prototype.onMath1Input.call(this, number);
-        this.setMath(this.formula(this.math1, this.math2));
-    };
-    BinaryMathBlock.prototype.onMath2Input = function (number) {
-        Math2ListenerMixin.prototype.onMath2Input.call(this, number);
+    BinaryMathBlock.prototype.onClockInput = function (clock) {
         this.setMath(this.formula(this.math1, this.math2));
     };
     mylib.BinaryMath = BinaryMathBlock;
