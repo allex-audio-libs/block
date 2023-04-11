@@ -31,15 +31,17 @@
         }
     },{
         "name": "AModulator1",
-        "type": "SawGenerator",
+        "type": "TriangleGenerator",
         "options": {
-            "FrequencyHz": 0.8
+            "FrequencyHz": 0.8,
+            "PulseWidth": 0.5
         }
     },{
         "name": "AModulator2",
-        "type": "SawGenerator",
+        "type": "TriangleGenerator",
         "options": {
-            "FrequencyHz": 0.8
+            "FrequencyHz": 0.8,
+            "PulseWidth": 0.1
         }
     },{
         "name": "Converter1",

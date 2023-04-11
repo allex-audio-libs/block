@@ -14,6 +14,7 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     require('./periodicgeneratorcreator')(lib, eventlib, mylib);
     require('./sinegeneratorcreator')(lib, mylib);
     require('./sawgenerator')(lib, mylib);
+    require('./trianglegenerator')(lib, mylib);
     require('./squaregenerator')(lib, mylib);
     
     require('./mathcreator')(lib, templateslib, mylib);
