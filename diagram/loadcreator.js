@@ -1,4 +1,4 @@
-function createDiagram (lib, mylib) {
+function createDiagramLoad (lib, Diagram, mylib) {
     'use strict';
 
     function isValidBlock (block) {
@@ -58,18 +58,6 @@ function createDiagram (lib, mylib) {
         lib.isArrayOfHaving(desc.links, isValidLink);
     }
 
-    function Diagram () {
-        this.blocks = new lib.Map();
-        this.links = [];
-    }
-    Diagram.prototype.destroy = function () {
-        this.purge();
-        if (this.blocks) {
-            this.blocks.destroy();
-        }
-        this.blocks = null;
-        this.links = null;
-    };
     Diagram.prototype.load = function (desc) {
         if (!this.blocks) {
             return; //I'm dead already
@@ -79,48 +67,5 @@ function createDiagram (lib, mylib) {
         desc.blocks.forEach(this.createBlock.bind(this));
         desc.links.forEach(this.createLink.bind(this));
     };
-    Diagram.prototype.purge = function () {
-        if (this.blocks) {
-            lib.containerDestroyAll(this.blocks);
-            this.blocks.purge();
-        }
-        if (lib.isArray(this.links)) {
-            lib.arryDestroyAll(this.links); //or maybe NOT, we'll see soon
-        }
-        this.links = [];
-    };
-
-    Diagram.prototype.createBlock = function (blockdesc) {
-        var b = new mylib[blockdesc.type]();
-        this.blocks.add(blockdesc.name, b);
-        if (blockdesc.options) {
-            lib.traverseShallow(blockdesc.options, optioner.bind(null, b));
-        }
-        b = null;
-    };
-    function optioner (block, optval, optname) {
-        var methodname = 'set'+optname, method = block[methodname];
-        if (lib.isFunction(method)) {
-            method.call(block, optval);
-            //b.setVolume(.5) <=> b.setVolume.call(b, .5) <=> b['setVolume'].call(b, .5);
-            return;
-        }
-        //maybe warn?
-        console.warn(methodname, 'is not a method of', block.constructor.name);
-    }
-    Diagram.prototype.createLink = function (linkdesc) {
-        var inb, outb;
-        inb = this.blocks.get(linkdesc.in.name);
-        if (!inb) {
-            return; //maybe warn?
-        }
-        outb = this.blocks.get(linkdesc.out.name);
-        if (!outb) {
-            return; //maybe warn?
-        }
-        inb.attachToPreviousBlock(outb, linkdesc.out.channel, linkdesc.in.channel);
-    };
-
-    mylib.Diagram = Diagram;
 }
-module.exports = createDiagram;
+module.exports = createDiagramLoad;

@@ -19,7 +19,7 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     
     require('./mathcreator')(lib, templateslib, mylib);
 
-    require('./diagramcreator')(lib, mylib);
+    require('./diagram')(lib, mylib);
 
     return mylib;
 }
