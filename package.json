@@ -11,7 +11,8 @@
     "url": "git+https://github.com/allex-audio-libs/block.git"
   },
   "dependencies": {
-    "speaker": "^0.5.4"
+    "fili": "2.x",
+    "speaker": "0.x"
   },
   "keywords": [
     "ecosystem:AllexJS",

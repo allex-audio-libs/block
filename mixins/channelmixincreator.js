@@ -108,5 +108,7 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
     addMixin('Math');
     addMixin('Math1');
     addMixin('Math2');
+
+    addMixin('Resonance');
 }
 module.exports = createChannelMixins;

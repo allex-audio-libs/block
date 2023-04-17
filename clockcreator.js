@@ -10,7 +10,7 @@ function createClockBlock (lib, timerlib, eventlib, mylib) {
 
     function ClockBlock () {
         MyBase.call(this);
-        SampleRateEmitterMixin.call(this);
+        SampleRateEmitterMixin.call(this, 0);
         SampleRateListenerMixin.call(this);
         ClockEmitterMixin.call(this, 0);
         this.lastCall = lib.now();

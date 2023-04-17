@@ -20,6 +20,8 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     
     require('./mathcreator')(lib, templateslib, mylib);
 
+    require('./filters')(lib, templateslib, mylib);
+
     require('./diagram')(lib, mylib);
 
     return mylib;
