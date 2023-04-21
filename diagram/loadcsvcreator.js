@@ -30,7 +30,7 @@ function createDiagramLoadCsv (lib, Diagram, mylib) {
             return;
         }
         line = line.trim();
-        if (!line) {
+        if (!line || line.startsWith('//')) {
             if (this.linesProcessed>0) {
                 this.mode = _CREATINGLINKS;
             }

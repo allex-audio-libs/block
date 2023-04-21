@@ -79,9 +79,6 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
         this.createNate();
     };
     SpeakerBlock.prototype.onSamplesInput = function (sample) {
-        if (Math.abs(sample)>1) {
-            var a = 5;
-        }
         this.setSamples(this.produceSample(sample));
     };
 

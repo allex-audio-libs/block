@@ -5,7 +5,6 @@ function createBaseGenerator (lib, mylib) {
     var ClockListenerMixin = mylib.mixins.ClockListener;
     var SamplesEmitterMixin = mylib.mixins.SamplesEmitter;
 
-
     function GeneratorBaseBlock () {
         MyBase.call(this);
         ClockListenerMixin.call(this);

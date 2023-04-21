@@ -32,10 +32,10 @@ function createBlockBase (lib, bufferlib, eventlib, mylib) {
         prevblockeventname = 'has'+prevblockoutputname+'Output';
         myeventhandlername = 'on'+inputname+'Inputer';
         if (!lib.isFunction(this.prevblock[prevblockeventname].attach)) {
-            throw new lib.Error('NOT_AN_EVENT', prevblockeventname+' is not an Event');
+            throw new lib.Error('NOT_AN_EVENT', prevblockeventname+' is not an Event on '+this.prevblock.constructor.name);
         }
         if (!lib.isFunction(this.currblock[myeventhandlername])) {
-            throw new lib.Error('NOT_A_FUNCTION', myeventhandlername+' is not a Function');
+            throw new lib.Error('NOT_A_FUNCTION', myeventhandlername+' is not a Function on '+this.currblock.constructor.name);
         }
         this.event = this.prevblock[prevblockeventname];
         this.handler = this.currblock[myeventhandlername];

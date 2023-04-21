@@ -3,7 +3,8 @@ function createMixins (lib, eventlib, templateslib, mylib) {
 
     var mixins = {};
 
-    require('./channelmixincreator')(lib, eventlib, templateslib, mylib, mixins);
+    require('./channelcreator')(lib, eventlib, templateslib, mylib, mixins);
+    require('./filterimplementationhandlercreator')(lib, eventlib, templateslib, mylib, mixins);
 
     mylib.mixins = mixins;
 }
