@@ -8,16 +8,19 @@ function createFiliFilters (lib, bufferlib, templateslib, mylib) {
     var FrequencyHzEmitterMixin = mylib.mixins.FrequencyHzEmitter;
     var ResonanceEmitterMixin = mylib.mixins.ResonanceEmitter;
 
+    var FilterImplementationHandlerMixin = mylib.mixins.FilterImplementationHandler;
+
     var _BUFFERLENGTH = 64;
 
     function BaseFiliFilterBlock () {
         Base.call(this);
+        FilterImplementationHandlerMixin.call(this);
         SampleRateEmitterMixin.call(this, 0);
         SampleRateListenerMixin.call(this);
-        this.implementation = null;
         this.buffer = new bufferlib.NumericBuffer(_BUFFERLENGTH);
     }
     lib.inherit(BaseFiliFilterBlock, Base);
+    FilterImplementationHandlerMixin.addMethods(BaseFiliFilterBlock);
     SampleRateEmitterMixin.addMethods(BaseFiliFilterBlock);
     SampleRateListenerMixin.addMethods(BaseFiliFilterBlock);
     BaseFiliFilterBlock.prototype.destroy = function () {
@@ -25,9 +28,9 @@ function createFiliFilters (lib, bufferlib, templateslib, mylib) {
             this.buffer.destroy();
         }
         this.buffer = null;
-        purgeImplementation.call(this);
         SampleRateListenerMixin.prototype.destroy.call(this);
         SampleRateEmitterMixin.prototype.destroy.call(this);
+        FilterImplementationHandlerMixin.destroy.call(this);
         Base.prototype.destroy.call(this);
     };
     BaseFiliFilterBlock.prototype.announceFrequencyHzOutput = function (number) {
@@ -58,20 +61,10 @@ function createFiliFilters (lib, bufferlib, templateslib, mylib) {
         return ret;
     };
 
-    BaseFiliFilterBlock.prototype.createImplementation = function () {
-        //this.frequencyHz has the actual value
-        //this.resonance has the actual value
-        throw new lib.Error('NOT_IMPLEMENTED', this.constructor.name+' has to implement createImplementation');
-    };
-    require('./implementationhandlercreator')(lib, BaseFiliFilterBlock);
 
     //static methods
     function replaceImplementation () {
-        purgeImplementation.call(this);
         this.handleImplementation(this.createImplementation());
-    }
-    function purgeImplementation () {
-        this.implementation = null; //TODO: maybe destroy?
     }
     //endof static methods
 

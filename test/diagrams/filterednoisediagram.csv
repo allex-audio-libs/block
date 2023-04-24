@@ -6,7 +6,7 @@ Converter1	MinusOnePlusOneToZeroPlusOne
 Converter2	MinusOnePlusOneToZeroPlusOne
 Adder	Adder	Math2	500
 Amplifier	Multiplier	Math2	200
-Filter	BilinearIIRFiliBesselBandpassFilter	FrequencyHz	300	Resonance	.9	Volume	5.5
+Filter	BilinearIIRFiliBesselBandpassFilter	FrequencyHz	300	Resonance	.9	Volume	1
 Speaker	Speaker	Channels	1
 
 Clock	Clock	Noise	Clock

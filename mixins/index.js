@@ -1,10 +1,10 @@
-function createMixins (lib, eventlib, templateslib, mylib) {
+function createMixins (lib, bufferlib, eventlib, templateslib, mylib) {
     'use strict';
 
     var mixins = {};
 
     require('./channelcreator')(lib, eventlib, templateslib, mylib, mixins);
-    require('./filterimplementationhandlercreator')(lib, eventlib, templateslib, mylib, mixins);
+    require('./filterimplementationhandlercreator')(lib, bufferlib, eventlib, templateslib, mylib, mixins);
 
     mylib.mixins = mixins;
 }

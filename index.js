@@ -5,7 +5,7 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     var mylib = {};
 
     require('./helpers')(lib, mylib);
-    require('./mixins')(lib, eventlib, templateslib, mylib);
+    require('./mixins')(lib, bufferlib, eventlib, templateslib, mylib);
     require('./basecreator')(lib, bufferlib, eventlib, mylib);
     require('./sampleproducerbasecreator')(lib, bufferlib, eventlib, mylib);
     require('./clockcreator')(lib, timerlib, eventlib, mylib);
