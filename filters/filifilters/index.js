@@ -34,39 +34,22 @@ function createFiliFilters (lib, bufferlib, templateslib, mylib) {
         Base.prototype.destroy.call(this);
     };
     BaseFiliFilterBlock.prototype.announceFrequencyHzOutput = function (number) {
-        replaceImplementation.call(this);
+        this.setImplementationCandidate();
         FrequencyHzEmitterMixin.prototype.announceFrequencyHzOutput.call(this, number);
     };
     BaseFiliFilterBlock.prototype.announceResonanceOutput = function (number) {
-        replaceImplementation.call(this);
+        this.setImplementationCandidate();
         ResonanceEmitterMixin.prototype.announceResonanceOutput.call(this, number);
     };
     BaseFiliFilterBlock.prototype.announceSampleRateOutput = function (number) {
-        replaceImplementation.call(this);
+        this.setImplementationCandidate();
         SampleRateEmitterMixin.prototype.announceSampleRateOutput.call(this, number);
     };
     BaseFiliFilterBlock.prototype.onSamplesInput = function (sample) {
         this.buffer.push(sample);
         Base.prototype.onSamplesInput.call(this, sample);
     };
-    BaseFiliFilterBlock.prototype.produceSample = function (input) { //a number
-        var ret = this.implementation ?
-            this.implementation.singleStep(input)
-            :
-            0;
-        if (!lib.isNumber(ret)) {
-            console.log('Filter NaN');
-            return 0;
-        }
-        return ret;
-    };
 
-
-    //static methods
-    function replaceImplementation () {
-        this.handleImplementation(this.createImplementation());
-    }
-    //endof static methods
 
     mylib.BaseFiliFilter = BaseFiliFilterBlock;
 
