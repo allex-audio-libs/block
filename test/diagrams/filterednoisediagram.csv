@@ -4,9 +4,9 @@ AModulator1	TriangleGenerator	FrequencyHz	0.2	PulseWidth	0.5
 Sine	SineGenerator	FrequencyHz	.5
 Converter1	MinusOnePlusOneToZeroPlusOne
 Converter2	MinusOnePlusOneToZeroPlusOne
-Adder	Adder	Math2	500
-Amplifier	Multiplier	Math2	200
-Filter	BilinearIIRFiliBesselBandpassFilter	FrequencyHz	1700	Resonance	.9	Volume	5
+Adder	Adder	Math2	1700
+Amplifier	Multiplier	Math2	1300
+Filter	BilinearIIRFiliBesselBandpassFilter	FrequencyHz	1700	Resonance	.9	Volume	3
 Speaker	Speaker	Channels	1
 
 Clock	Clock	Noise	Clock

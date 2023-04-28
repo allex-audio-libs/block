@@ -21,7 +21,11 @@ function createFiliIIRFilters (lib, templateslib, mylib) {
             gain: 0,
             preGain: false
         });
-        return Fili.IirFilter(coeffs);
+        var ret = Fili.IirFilter(coeffs);
+        ret.sampleRate = this.sampleRate;
+        ret.frequencyHz = this.frequencyHz;
+        ret.resonance = this.resonance;
+        return ret;
     };
     //all BilinearIIRFiliFilters just have to put appropriate 'type' and 'characteristic' in their prototypes
 
