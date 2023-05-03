@@ -24,7 +24,7 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
         SampleRateEmitterMixin.call(this, 0);
         SampleRateListenerMixin.call(this);
         this.nateSpeaker = null;
-        this.dBuffer = new bufferlib.DoubleNodeJSBuffer(20480, this.onBufferReady.bind(this));        
+        this.dBuffer = new bufferlib.DoubleNodeJSBuffer(20480, this.onBufferReady.bind(this));
         this.speakerBusy = false;
         this.myRange = 2**16; //this.nateSpeaker.bitDepth;
         this.signed = null; //this.nateSpeaker.bitDepth == 8 ? true : false;
@@ -70,7 +70,8 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
         };
         this.nateSpeaker = new NateSpeaker(params);
         this.myRange = 2**16; //this.nateSpeaker.bitDepth;
-        this.signed = this.nateSpeaker.bitDepth == 8 ? true : false;
+        this.signed = this.nateSpeaker.bitDepth == 8 ? true : false; //whatever Nate meant with this "signed", we'll leave it for now (until proven wrong) like this
+        this.signed = true;
         this.myWriteMethod = (this.signed ? 'Int16' : 'UInt16')+this.nateSpeaker.endianness;
     };
 
@@ -94,7 +95,7 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
         var myinput = this.signed ? input : (input + 1);
         //in any case, myinput has a "peak-to-peak" range of 2
         //so the "input scale" is 2/this.myRange, I have to convert it to my range
-        var ret = Math.trunc(myinput*(this.myRange/2/2)); //additional division by 2 is to get out of the overload situation
+        var ret = Math.trunc(myinput*(this.myRange/2));
         return ret;
     };
 

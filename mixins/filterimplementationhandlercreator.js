@@ -3,12 +3,14 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
 
     function FilterIntroducer (filter) {
         this.filter = filter;
+        this.stepsMargin = 0;
         this.maxSteps = 0;
         this.steps = 0;
     }
     FilterIntroducer.prototype.destroy = function () {
         this.steps = null;
         this.maxSteps = null;
+        this.stepsMargin = null;
         this.filter = null; //don't destroy it, even if it can be destroyed
     };
     FilterIntroducer.prototype.step = function (sample) {
@@ -25,7 +27,13 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
         if (this.isDone()) {
             return 1;
         }
-        return this.steps/this.maxSteps;
+        if (this.steps<this.stepsMargin) {
+            return 0;
+        }
+        if (this.steps>this.maxSteps-this.stepsMargin) {
+            return 1;
+        }
+        return (this.steps - this.stepsMargin)/(this.maxSteps - 2*this.stepsMargin);
     };
     FilterIntroducer.prototype.antiProgress = function () {
         return 1-this.progress();
@@ -45,7 +53,8 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
         this.filter = filter;
     };
     FilterIntroducer.prototype.setSampleRate = function (samplerate) {
-        this.maxSteps = samplerate/10;
+        this.maxSteps = Math.floor(samplerate/10);
+        this.stepsMargin = Math.floor(samplerate/100);
     };
 
     //statics
@@ -134,9 +143,37 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
     FilterImplementationHandlerMixin.prototype.purgeImplementation = function () {
         this.implementation = null; //TODO: maybe destroy?
     };
+    var _exchangeCycle = 0;
+
+    //treated as static
+    function maybeLog (ret) {
+        return;
+        if (false || ( _exchangeCycle != 18 && _exchangeCycle != 19)) {
+            return;
+        }
+        console.log([
+            ret,
+            this.introducer.antiProgress(),
+            this.introducerSample,
+            this.introducer.progress()
+        ].join('\t'));
+    }
     FilterImplementationHandlerMixin.prototype.produceSample = function (input) { //a number
         this.handleImplementation(input);
-        var ret = this.implementation ?
+        var ret, finalret, wasdone;
+        if (this.introducer.isDone()) {
+            /*
+            if (this.introducer.progress() < 0.95) {
+                var a = 5;
+            }
+            */
+            _exchangeCycle++;
+            wasdone = true;
+            replaceImplementation.call(this, this.introducer.filter);
+            this.introducer.clear();
+            this.introducerSample = 0;
+        }
+        ret = this.implementation ?
             this.implementation.singleStep(input)
             :
             0;
@@ -144,16 +181,14 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
             console.log('Filter NaN');
             return 0;
         }
-        if (this.introducer.isDone()) {
-            replaceImplementation.call(this, this.introducer.filter);
-            this.introducer.clear();
-        }
         //console.log(ret*this.volume);
-        return (
+        finalret = (
             ret*this.introducer.antiProgress()
             +
             this.introducerSample*this.introducer.progress()
         );
+        maybeLog.call(this, ret);
+        return finalret;
     };
 
     //statics

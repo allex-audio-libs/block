@@ -157,7 +157,7 @@
         "linux": {
           "program": "${env:HOME}/lib/node_modules/allex/run.js",
         },
-        "args": ["scripts/playcsv", "test/diagrams/filterednoisediagram.csv", "15"]
+        "args": ["scripts/playcsv", "test/diagrams/filteredsawdiagram.csv", "15"]
       }    
     ]
 }

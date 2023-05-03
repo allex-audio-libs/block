@@ -9,7 +9,8 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     require('./basecreator')(lib, bufferlib, eventlib, mylib);
     require('./sampleproducerbasecreator')(lib, bufferlib, eventlib, mylib);
     require('./clockcreator')(lib, timerlib, eventlib, mylib);
-    require('./speakercreator')(lib, bufferlib, mylib);
+    
+    //generators
     require('./generatorbasecreator')(lib, mylib);
     require('./periodicgeneratorcreator')(lib, eventlib, mylib);
     require('./sinegeneratorcreator')(lib, mylib);
@@ -17,7 +18,13 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     require('./trianglegeneratorcreator')(lib, mylib);
     require('./squaregeneratorcreator')(lib, mylib);
     require('./noisegeneratorcreator')(lib, mylib);
-    
+    //endof generators
+
+    //outputters 
+    require('./fileoutcreator')(lib, bufferlib, mylib);
+    require('./speakercreator')(lib, bufferlib, mylib);
+    //endof outputters 
+
     require('./mathcreator')(lib, templateslib, mylib);
 
     require('./filters')(lib, bufferlib, templateslib, mylib);
