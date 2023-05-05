@@ -21,8 +21,7 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     //endof generators
 
     //outputters 
-    require('./fileoutcreator')(lib, bufferlib, mylib);
-    require('./speakercreator')(lib, bufferlib, mylib);
+    require('./output')(lib, bufferlib, eventlib, timerlib, templateslib, mylib);
     //endof outputters 
 
     require('./mathcreator')(lib, templateslib, mylib);

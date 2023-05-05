@@ -3,12 +3,7 @@ var NateSpeaker = require('speaker');
 function createSpeakerBlock (lib, bufferlib, mylib) {
     'use strict';
 
-    var MyBase = mylib.SampleProducerBase;
-    var ChannelsEmitterMixin = mylib.mixins.ChannelsEmitter;
-    var ChannelsListenerMixin = mylib.mixins.ChannelsListener;
-    var SamplesEmitterMixin = mylib.mixins.SamplesEmitter;
-    var SamplesListenerMixin = mylib.mixins.SamplesListener;
-    var SampleRateEmitterMixin = mylib.mixins.SampleRateEmitter;
+    var MyBase = mylib.OutputBase;
     var SampleRateListenerMixin = mylib.mixins.SampleRateListener;
 
     function isPositiveNumber (thingy) {
@@ -17,14 +12,7 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
 
     function SpeakerBlock () {
         MyBase.call(this);
-        ChannelsEmitterMixin.call(this, 1);
-        ChannelsListenerMixin.call(this);
-        SamplesEmitterMixin.call(this, 0);
-        SamplesListenerMixin.call(this);
-        SampleRateEmitterMixin.call(this, 0);
-        SampleRateListenerMixin.call(this);
         this.nateSpeaker = null;
-        this.dBuffer = new bufferlib.DoubleNodeJSBuffer(20480, this.onBufferReady.bind(this));
         this.speakerBusy = false;
         this.myRange = 2**16; //this.nateSpeaker.bitDepth;
         this.signed = null; //this.nateSpeaker.bitDepth == 8 ? true : false;
@@ -32,27 +20,11 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
         //this.myWriteMethod = 'UInt16LE';
     }
     lib.inherit(SpeakerBlock, MyBase);
-    ChannelsEmitterMixin.addMethods(SpeakerBlock);
-    ChannelsListenerMixin.addMethods(SpeakerBlock);
-    SamplesEmitterMixin.addMethods(SpeakerBlock);
-    SamplesListenerMixin.addMethods(SpeakerBlock);
-    SampleRateEmitterMixin.addMethods(SpeakerBlock);
-    SampleRateListenerMixin.addMethods(SpeakerBlock);
     SpeakerBlock.prototype.destroy = function () {
         this.myWriteMethod = null;
         this.myRange = null;
         this.speakerBusy = null;
-        if (this.dBuffer) {
-            this.dBuffer.destroy();
-        }
-        this.dBuffer = null;
         this.nateSpeaker = null;
-        SampleRateListenerMixin.prototype.destroy.call(this);
-        SampleRateEmitterMixin.prototype.destroy.call(this);
-        SamplesListenerMixin.prototype.destroy.call(this);
-        SamplesEmitterMixin.prototype.destroy.call(this);
-        ChannelsListenerMixin.prototype.destroy.call(this);
-        ChannelsEmitterMixin.prototype.destroy.call(this);
         MyBase.prototype.destroy.call(this);
     };
     SpeakerBlock.prototype.createNate = function () {
@@ -87,11 +59,11 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
         if (!this.myWriteMethod) {
             return;
         }
-        this.dBuffer.add(this.myWriteMethod, this.convertSampleForSpeaker(input));
+        this.writeSampleToBuffer(input);
         return input;
     };
 
-    SpeakerBlock.prototype.convertSampleForSpeaker = function (input) { //a number in the [-1, 1] range
+    SpeakerBlock.prototype.convertSampleForOutput = function (input) { //a number in the [-1, 1] range
         var myinput = this.signed ? input : (input + 1);
         //in any case, myinput has a "peak-to-peak" range of 2
         //so the "input scale" is 2/this.myRange, I have to convert it to my range
