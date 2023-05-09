@@ -41,7 +41,7 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
             sampleRate: this.sampleRate
         };
         this.nateSpeaker = new NateSpeaker(params);
-        this.myRange = 2**16; //this.nateSpeaker.bitDepth;
+        this.myRange = 2**16-1; //this.nateSpeaker.bitDepth;
         this.signed = this.nateSpeaker.bitDepth == 8 ? true : false; //whatever Nate meant with this "signed", we'll leave it for now (until proven wrong) like this
         this.signed = true;
         this.myWriteMethod = (this.signed ? 'Int16' : 'UInt16')+this.nateSpeaker.endianness;
@@ -50,17 +50,6 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
     SpeakerBlock.prototype.onSampleRateInput = function (samplerate) {
         SampleRateListenerMixin.prototype.onSampleRateInput.call(this, samplerate);
         this.createNate();
-    };
-    SpeakerBlock.prototype.onSamplesInput = function (sample) {
-        this.setSamples(this.produceSample(sample));
-    };
-
-    SpeakerBlock.prototype.produceSample = function (input) { //a number in the [-1, 1] range
-        if (!this.myWriteMethod) {
-            return;
-        }
-        this.writeSampleToBuffer(input);
-        return input;
     };
 
     SpeakerBlock.prototype.convertSampleForOutput = function (input) { //a number in the [-1, 1] range

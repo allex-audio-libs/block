@@ -7,7 +7,7 @@ Converter2	MinusOnePlusOneToZeroPlusOne
 Adder	Adder	Math2	1200
 Amplifier	Multiplier	Math2	0
 Filter	BilinearIIRFiliBesselBandpassFilter	FrequencyHz	1200	Resonance	.9	Volume	3
-Speaker	FileOut	Channels	1
+Speaker	Speaker	Channels	2
 
 Clock	Clock	Saw	Clock
 Clock	Clock	AModulator1	Clock
@@ -27,4 +27,5 @@ Adder	Math	Filter	FrequencyHz
 
 //Converter1	Math	Saw	Volume
 Saw	Samples	Filter	Samples
-Filter	Samples	Speaker	Samples
+Filter	Samples	Speaker	Channel1
+Filter	FilterSwitchingEnvelope	Speaker	Channel2

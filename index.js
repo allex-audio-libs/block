@@ -21,7 +21,7 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     //endof generators
 
     //outputters 
-    require('./output')(lib, bufferlib, eventlib, timerlib, templateslib, mylib);
+    require('./outputters')(lib, bufferlib, eventlib, timerlib, templateslib, mylib);
     //endof outputters 
 
     require('./mathcreator')(lib, templateslib, mylib);

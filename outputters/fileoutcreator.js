@@ -20,9 +20,6 @@ function createFileOutBlock (lib, bufferlib, mylib) {
     FileOutBlock.prototype.convertSampleForOutput = function (input) {
         return input * 32200;
     };
-    FileOutBlock.prototype.onSamplesInput = function (sample) {
-        this.writeSampleToBuffer(sample);
-    };
 
     FileOutBlock.prototype.onBufferReady = function (buff) {
         if (!this.file) {

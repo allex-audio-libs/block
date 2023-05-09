@@ -114,5 +114,6 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
     }
 
     addMixin('Resonance');
+    addMixin('FilterSwitchingEnvelope');
 }
 module.exports = createChannelMixins;

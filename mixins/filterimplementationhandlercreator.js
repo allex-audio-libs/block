@@ -89,7 +89,10 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
         return null;
     };
 
+    var FilterSwitchingEnvelopeEmitterMixin = mixins.FilterSwitchingEnvelopeEmitter;
+
     function FilterImplementationHandlerMixin () {
+        FilterSwitchingEnvelopeEmitterMixin.call(this, 0);
         this.filterIntroductors = new bufferlib.DynaBuffer();
         this.implementation = null;
         this.implementationCandidate = null;
@@ -110,6 +113,7 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
             this.filterIntroductors.destroy();
         }
         this.filterIntroductors = null;
+        FilterSwitchingEnvelopeEmitterMixin.prototype.destroy.call(this);
     };
 
     FilterImplementationHandlerMixin.prototype.createImplementation = function () {
@@ -160,7 +164,7 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
     }
     FilterImplementationHandlerMixin.prototype.produceSample = function (input) { //a number
         this.handleImplementation(input);
-        var ret, finalret, wasdone;
+        var ret, finalret, wasdone, progress;
         if (this.introducer.isDone()) {
             /*
             if (this.introducer.progress() < 0.95) {
@@ -182,12 +186,14 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
             return 0;
         }
         //console.log(ret*this.volume);
+        progress = this.introducer.progress();
         finalret = (
             ret*this.introducer.antiProgress()
             +
-            this.introducerSample*this.introducer.progress()
+            this.introducerSample*progress
         );
         maybeLog.call(this, ret);
+        FilterSwitchingEnvelopeEmitterMixin.prototype.announceFilterSwitchingEnvelopeOutput.call(this, progress/12);
         return finalret;
     };
 
@@ -200,6 +206,7 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
     //endof statics
 
     FilterImplementationHandlerMixin.addMethods = function (klass) {
+        FilterSwitchingEnvelopeEmitterMixin.addMethods(klass);
         lib.inheritMethods(klass, FilterImplementationHandlerMixin
             , 'createImplementation'
             , 'setImplementationCandidate'

@@ -42,6 +42,15 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
             return 'mylib.mixins.Channel'+i+'Listener.prototype.destroy.call(this);\nmylib.mixins.Channel'+i+'Emitter.prototype.destroy.call(this);\n'
         }, true);
     }
+    function onChanneler () {
+        return channelTemplater(function (i) {
+            return [
+                'OutputBaseBlock.prototype.onChannel'+i+'Input = function (sample) {',
+                '\tonAnyChannelInput.call(this, '+i+', sample);',
+                '};\n'
+            ].join('\n');
+        });
+    }
     
 
     var MyBase = mylib.SampleProducerBase;
@@ -77,11 +86,30 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
         ChannelsEmitterMixin.prototype.destroy.call(this);
         MyBase.prototype.destroy.call(this);
     };
-    OutputBaseBlock.prototype.writeSampleToBuffer = function (sample) {
+    eval(onChanneler());
+
+    function onAnyChannelInput (channelindex, sample) {
+        if (channelindex<1 || channelindex>this.channels) {
+            return;
+        }
+        if (channelindex == 2 && (sample>1 || sample<-1)) {
+            var a = 5;
+        }
+        produceSample.call(this, sample);
+    };
+    function produceSample (input) { //a number in the [-1, 1] range
+        if (!this.myWriteMethod) {
+            return;
+        }
+        writeSampleToBuffer.call(this, input);
+        return input;
+    };
+    function writeSampleToBuffer (sample) {
         //myWriteMethod is not defined in this base class at all, it is left to the children
         this.dBuffer.add(this.myWriteMethod, this.convertSampleForOutput(sample));
     };
 
+    
     OutputBaseBlock.prototype.convertSampleForOutput = function (sample) {
         return sample;
     };
