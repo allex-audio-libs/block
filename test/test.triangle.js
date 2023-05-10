@@ -24,7 +24,7 @@ describe('Test Triangle', function () {
         Clock.setSampleRate(44100);
         Triangle.attachToPreviousBlock(Clock, 'Clock', 'Clock');
         Speaker.attachToPreviousBlock(Clock, 'SampleRate', 'SampleRate');
-        Speaker.attachToPreviousBlock(Triangle, 'Samples', 'Samples');
+        Speaker.attachToPreviousBlock(Triangle, 'Samples', 'Channel1');
     });
     it('Wait', function () {
         this.timeout(1e7);
@@ -34,7 +34,7 @@ describe('Test Triangle', function () {
         Triangle.detachFromPreviousBlock(Clock, 'Clock', 'Clock');
         expect(Triangle.attachments.length).to.equal(0);
         expect(Clock.hasClockOutput.listeners.length).to.equal(0);
-        Speaker.detachFromPreviousBlock(Triangle, 'Samples', 'Samples');
+        Speaker.detachFromPreviousBlock(Triangle, 'Samples', 'Channel1');
         Speaker.detachFromPreviousBlock(Clock, 'SampleRate', 'SampleRate');
         expect(Speaker.attachments.length).to.equal(0);
         expect(Triangle.hasSamplesOutput.listeners.length).to.equal(0);

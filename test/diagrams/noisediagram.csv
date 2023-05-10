@@ -16,4 +16,4 @@ Sine	Samples	Converter2	Math
 Converter2	Math	AModulator1	PulseWidth
 AModulator1	Samples	Converter1	Math
 Converter1	Math	Noise	Volume
-Noise	Samples	Speaker	Samples
+Noise	Samples	Speaker	Channel1

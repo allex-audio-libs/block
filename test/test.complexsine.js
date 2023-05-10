@@ -34,7 +34,7 @@ describe('Test Complex Sine', function () {
         Sine.attachToPreviousBlock(SlowSine, 'Samples', 'FrequencyHzModulation');
         //Sine.attachToPreviousBlock(SlowSine, 'Samples', 'Volume');
         Speaker.attachToPreviousBlock(Clock, 'SampleRate', 'SampleRate');
-        Speaker.attachToPreviousBlock(Sine, 'Samples', 'Samples');
+        Speaker.attachToPreviousBlock(Sine, 'Samples', 'Channel1');
     });
     it('Wait', function () {
         this.timeout(1e7);
@@ -46,7 +46,7 @@ describe('Test Complex Sine', function () {
         Sine.detachFromPreviousBlock(SlowSine, 'Samples', 'FrequencyHzModulation');
         expect(Sine.attachments.length).to.equal(0);
         expect(Clock.hasClockOutput.listeners.length).to.equal(0);
-        Speaker.detachFromPreviousBlock(Sine, 'Samples', 'Samples');
+        Speaker.detachFromPreviousBlock(Sine, 'Samples', 'Channel1');
         Speaker.detachFromPreviousBlock(Clock, 'SampleRate', 'SampleRate');
         expect(Speaker.attachments.length).to.equal(0);
         expect(Sine.hasSamplesOutput.listeners.length).to.equal(0);

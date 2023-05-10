@@ -24,7 +24,7 @@ describe('Test Sine', function () {
         Clock.setSampleRate(44100);        
         Sine.attachToPreviousBlock(Clock, 'Clock', 'Clock');
         Speaker.attachToPreviousBlock(Clock, 'SampleRate', 'SampleRate');
-        Speaker.attachToPreviousBlock(Sine, 'Samples', 'Samples');
+        Speaker.attachToPreviousBlock(Sine, 'Samples', 'Channel1');
     });
     it('Wait', function () {
         this.timeout(1e7);
@@ -34,7 +34,7 @@ describe('Test Sine', function () {
         Sine.detachFromPreviousBlock(Clock, 'Clock', 'Clock');
         expect(Sine.attachments.length).to.equal(0);
         expect(Clock.hasClockOutput.listeners.length).to.equal(0);
-        Speaker.detachFromPreviousBlock(Sine, 'Samples', 'Samples');
+        Speaker.detachFromPreviousBlock(Sine, 'Samples', 'Channel1');
         Speaker.detachFromPreviousBlock(Clock, 'SampleRate', 'SampleRate');
         expect(Speaker.attachments.length).to.equal(0);
         expect(Sine.hasSamplesOutput.listeners.length).to.equal(0);

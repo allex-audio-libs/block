@@ -73,7 +73,7 @@ var mycsv = [
 "Sine1	Samples	Adder	Math1",
 "Sine2	Samples	Adder	Math2",
 "Adder	Math	OutAttn	Math1",
-"OutAttn	Math	Speaker	Samples",
+"OutAttn	Math	Speaker	Channel1",
 ].join('\r\n');
 
 describe('Test Diagram', function () {

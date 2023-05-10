@@ -52,9 +52,10 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
     FilterIntroducer.prototype.setFilter = function (filter) {
         this.filter = filter;
     };
+    var _SAMPLERATERATIO = 50;
     FilterIntroducer.prototype.setSampleRate = function (samplerate) {
-        this.maxSteps = Math.floor(samplerate/10);
-        this.stepsMargin = Math.floor(samplerate/100);
+        this.maxSteps = Math.floor(samplerate/_SAMPLERATERATIO) || 3;
+        this.stepsMargin = Math.floor(samplerate/_SAMPLERATERATIO/10) || 1;
     };
 
     //statics
@@ -164,19 +165,7 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
     }
     FilterImplementationHandlerMixin.prototype.produceSample = function (input) { //a number
         this.handleImplementation(input);
-        var ret, finalret, wasdone, progress;
-        if (this.introducer.isDone()) {
-            /*
-            if (this.introducer.progress() < 0.95) {
-                var a = 5;
-            }
-            */
-            _exchangeCycle++;
-            wasdone = true;
-            replaceImplementation.call(this, this.introducer.filter);
-            this.introducer.clear();
-            this.introducerSample = 0;
-        }
+        var ret, finalret, progress, antiprogress;
         ret = this.implementation ?
             this.implementation.singleStep(input)
             :
@@ -187,13 +176,20 @@ function createFilterImplementationHandlerMixin (lib, bufferlib, eventlib, templ
         }
         //console.log(ret*this.volume);
         progress = this.introducer.progress();
+        antiprogress = this.introducer.antiProgress();
         finalret = (
-            ret*this.introducer.antiProgress()
+            ret*antiprogress
             +
             this.introducerSample*progress
         );
         maybeLog.call(this, ret);
         FilterSwitchingEnvelopeEmitterMixin.prototype.announceFilterSwitchingEnvelopeOutput.call(this, progress/12);
+        if (this.introducer.isDone()) {
+            _exchangeCycle++;
+            replaceImplementation.call(this, this.introducer.filter);
+            this.introducer.clear();
+            //this.introducerSample = 0;
+        }
         return finalret;
     };
 

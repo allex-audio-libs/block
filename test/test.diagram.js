@@ -112,7 +112,7 @@ var sinesineamod = {
         },
         in: {
             name: 'Speaker',
-            channel: 'Samples'
+            channel: 'Channel1'
         }
     }]
 };
@@ -186,7 +186,7 @@ var sinesinefmod = {
         },
         in: {
             name: 'Speaker',
-            channel: 'Samples'
+            channel: 'Channel1'
         }
     }]
 };
@@ -272,7 +272,7 @@ var sinesquareamod = {
         },
         in: {
             name: 'Speaker',
-            channel: 'Samples'
+            channel: 'Channel1'
         }
     }]
 };
@@ -346,7 +346,7 @@ var sinesquarefmod = {
         },
         in: {
             name: 'Speaker',
-            channel: 'Samples'
+            channel: 'Channel1'
         }
     }]
 };
@@ -432,7 +432,7 @@ var sinesawamod = {
         },
         in: {
             name: 'Speaker',
-            channel: 'Samples'
+            channel: 'Channel1'
         }
     }]
 };
@@ -506,7 +506,7 @@ var sinesawfmod = {
         },
         in: {
             name: 'Speaker',
-            channel: 'Samples'
+            channel: 'Channel1'
         }
     }]
 };

@@ -24,7 +24,7 @@ describe('Test Square', function () {
         Clock.setSampleRate(44100);
         Square.attachToPreviousBlock(Clock, 'Clock', 'Clock');
         Speaker.attachToPreviousBlock(Clock, 'SampleRate', 'SampleRate');
-        Speaker.attachToPreviousBlock(Square, 'Samples', 'Samples');
+        Speaker.attachToPreviousBlock(Square, 'Samples', 'Channel1');
     });
     it('Wait', function () {
         this.timeout(1e7);
@@ -34,7 +34,7 @@ describe('Test Square', function () {
         Square.detachFromPreviousBlock(Clock, 'Clock', 'Clock');
         expect(Square.attachments.length).to.equal(0);
         expect(Clock.hasClockOutput.listeners.length).to.equal(0);
-        Speaker.detachFromPreviousBlock(Square, 'Samples', 'Samples');
+        Speaker.detachFromPreviousBlock(Square, 'Samples', 'Channel1');
         Speaker.detachFromPreviousBlock(Clock, 'SampleRate', 'SampleRate');
         expect(Speaker.attachments.length).to.equal(0);
         expect(Square.hasSamplesOutput.listeners.length).to.equal(0);

@@ -24,7 +24,7 @@ describe('Test Saw', function () {
         Clock.setSampleRate(44100);
         Saw.attachToPreviousBlock(Clock, 'Clock', 'Clock');
         Speaker.attachToPreviousBlock(Clock, 'SampleRate', 'SampleRate');
-        Speaker.attachToPreviousBlock(Saw, 'Samples', 'Samples');
+        Speaker.attachToPreviousBlock(Saw, 'Samples', 'Channel1');
     });
     it('Wait', function () {
         this.timeout(1e7);
@@ -34,7 +34,7 @@ describe('Test Saw', function () {
         Saw.detachFromPreviousBlock(Clock, 'Clock', 'Clock');
         expect(Saw.attachments.length).to.equal(0);
         expect(Clock.hasClockOutput.listeners.length).to.equal(0);
-        Speaker.detachFromPreviousBlock(Saw, 'Samples', 'Samples');
+        Speaker.detachFromPreviousBlock(Saw, 'Samples', 'Channel1');
         Speaker.detachFromPreviousBlock(Clock, 'SampleRate', 'SampleRate');
         expect(Speaker.attachments.length).to.equal(0);
         expect(Saw.hasSamplesOutput.listeners.length).to.equal(0);

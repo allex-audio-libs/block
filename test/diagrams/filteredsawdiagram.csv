@@ -5,9 +5,9 @@ Sine	SineGenerator	FrequencyHz	.5
 Converter1	MinusOnePlusOneToZeroPlusOne
 Converter2	MinusOnePlusOneToZeroPlusOne
 Adder	Adder	Math2	1200
-Amplifier	Multiplier	Math2	0
-Filter	BilinearIIRFiliBesselBandpassFilter	FrequencyHz	1200	Resonance	.9	Volume	3
-Speaker	Speaker	Channels	2
+Amplifier	Multiplier	Math2	1000
+Filter	BilinearIIRFiliBesselBandpassFilter	FrequencyHz	1200	Resonance	1	Volume	3
+Speaker	Speaker	Channels	1
 
 Clock	Clock	Saw	Clock
 Clock	Clock	AModulator1	Clock
@@ -25,7 +25,7 @@ AModulator1	Samples	Amplifier	Math1
 Amplifier	Math	Adder	Math1
 Adder	Math	Filter	FrequencyHz
 
-//Converter1	Math	Saw	Volume
+Converter1	Math	Saw	Volume
 Saw	Samples	Filter	Samples
 Filter	Samples	Speaker	Channel1
 Filter	FilterSwitchingEnvelope	Speaker	Channel2

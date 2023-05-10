@@ -8,7 +8,7 @@ function fakeGenerator (clockinput) {
 
 function ourSampleProducer (clockinput) {
     var output = fakeGenerator(clockinput); //in the [-1, 1] range
-    Speaker.onSamplesInput(output);
+    Speaker.onChannel1Input(output);
 }
 
 describe('Test Speaker', function () {
@@ -27,6 +27,7 @@ describe('Test Speaker', function () {
     it('Listen to clock and Wait', function () {
         this.timeout(1e7);
         Clock.setSampleRate(44100);
+        Speaker.setChannels(1);
         Speaker.onSampleRateInput(Clock.sampleRate); //shortcut in low-level test
         Clock.hasClockOutput.attach(ourSampleProducer);
         return lib.q.delay(5000, true);

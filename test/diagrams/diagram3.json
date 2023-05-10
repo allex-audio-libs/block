@@ -324,7 +324,7 @@
         },
         "in": {
             "name": "Speaker",
-            "channel": "Samples"
+            "channel": "Channel1"
         }
     }]
 }
