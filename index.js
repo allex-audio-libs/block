@@ -28,8 +28,6 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
 
     require('./filters')(lib, bufferlib, templateslib, mylib);
 
-    require('./diagram')(lib, mylib);
-
     return mylib;
 }
 
