@@ -5,6 +5,7 @@ function createMixins (lib, bufferlib, eventlib, templateslib, mylib) {
 
     require('./channelcreator')(lib, eventlib, templateslib, mylib, mixins);
     require('./filterimplementationhandlercreator')(lib, bufferlib, eventlib, templateslib, mylib, mixins);
+    require('./classcreatorcreator')(lib, templateslib, mylib, mixins);
 
     mylib.mixins = mixins;
 }
