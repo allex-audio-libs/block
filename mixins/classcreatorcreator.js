@@ -1,6 +1,12 @@
 function createClassCreator (lib, templateslib, mylib, mixins) {
     'use strict';
 
+    //general helpers
+    function methodliner (line) {
+        return '\t'+line+';'
+    }
+    //endof general helpers
+
     //field related stuff
     function isField(field) {
         return field &&
@@ -25,13 +31,17 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
         return '';
     }
     function ctorer (options) {
-        var lines = ['function '+options.name+' ('+options.ctorparams.join(', ')+') {'];
+        var lines = ['function '+options.name+' ('+options.ctor.params.join(', ')+') {'];
         if (options.base) {
             lines.push('\t'+options.base+'.call(this);');
         }
         Array.prototype.push.apply(lines, options.mixins.map(ctormixiner));
         Array.prototype.push.apply(lines, options.fields.map(ctorfielder));
-        lines.push('}')
+        Array.prototype.push.apply(lines, options.ctor.lines.map(methodliner));
+        if (options.ctor.debug) {
+            lines.push('\tdebugger;');
+        }
+        lines.push('}');
         return lines.join('\n');
     }
     //endof ctor related stuff
@@ -104,12 +114,20 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
     }
     //endof dtor related stuff
 
-    //methoder related stuff
-    function methodliner (line) {
-        return '\t'+line+';'
+    //mixin related stuff
+    function mixinaddmethodser (options, mixin) {
+        return mixin+'.addMethods('+options.name+');'
     }
-    function singlemethoder (options, res, method, methodname) {
+    function mixiner (options) {
         var a = 5;
+        var ret = options.mixins.map(mixinaddmethodser.bind(null, options)).join('\n');
+        options = null;
+        return ret;
+    }
+    //endof mixin related stuff
+
+    //methoder related stuff
+    function singlemethoder (options, res, method, methodname) {
         res.lines.push(
             options.name+'.prototype.'+methodname+' = function ('+method.params.join(', ')+') {',
         );
@@ -144,7 +162,9 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
         if (!(lib.isString(options.name) && options.name.length)) {
             throw new lib.Error('NO_CLASS_NAME', 'options must have a name [String]');
         }
-        options.ctorparams = options.ctorparams||[];
+        options.ctor = options.ctor || {};
+        options.ctor.params = options.ctor.params||[];
+        options.ctor.lines = options.ctor.lines||[];
         options.mixins = options.mixins||[];
         options.fields = options.fields||[];
         options.methods = options.methods||[];
@@ -152,6 +172,7 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
             '(function () {',
             ctorer(options),
             'lib.inherit('+options.name+', '+options.base+');',
+            mixiner(options),
             dtorer(options),
             methoder(options),
             'return '+options.name+';',
