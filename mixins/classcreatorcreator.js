@@ -32,15 +32,15 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
     }
     function ctorer (options) {
         var lines = ['function '+options.name+' ('+options.ctor.params.join(', ')+') {'];
+        if (options.ctor.debug) {
+            lines.push('\tdebugger;');
+        }
         if (options.base) {
             lines.push('\t'+options.base+'.call(this);');
         }
         Array.prototype.push.apply(lines, options.mixins.map(ctormixiner));
         Array.prototype.push.apply(lines, options.fields.map(ctorfielder));
         Array.prototype.push.apply(lines, options.ctor.lines.map(methodliner));
-        if (options.ctor.debug) {
-            lines.push('\tdebugger;');
-        }
         lines.push('}');
         return lines.join('\n');
     }
