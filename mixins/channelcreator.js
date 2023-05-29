@@ -115,5 +115,12 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
 
     addMixin('Resonance');
     addMixin('FilterSwitchingEnvelope');
+
+    mylib.requestChannelMixin = function (channelname, isemitter) {
+        if (!mylib[channelname+'Emitter']) { //the logic is that if channelname+'Emitter' exists, channelname+'Listener' exists for sure, they always go in pairs
+            addMixin(channelname);
+        }
+        return mylib[channelname+ ( isemitter ? 'Emitter' : 'Listener' )];
+    }
 }
 module.exports = createChannelMixins;
