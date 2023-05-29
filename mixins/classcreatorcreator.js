@@ -16,7 +16,12 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
 
     //ctor related stuff
     function ctormixiner (mixin) {
-        return '\t'+mixin+'.call(this);'
+        if (lib.isString(mixin)) {
+            return '\t'+mixin+'.call(this);';
+        }
+        if (mixin && lib.isString(mixin.name)) {
+            return '\t'+mixin.name+'.call('+['this'].concat(mixin.params||[]).join(', ')+');';
+        }
     }
     function ctorfielder (field) {
         if (!field) {
@@ -63,7 +68,12 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
         return seed;
     }
     function dtormixiner (mixin) {
-        return '\t'+mixin+'.prototype.destroy.call(this);';
+        if (lib.isString(mixin)) {
+            return '\t'+mixin+'.prototype.destroy.call(this);';
+        }
+        if (mixin && lib.isString(mixin.name)) {
+            return '\t'+mixin.name+'.prototype.destroy.call(this);';
+        }
     }
     function dtorfieldnamer (field) {
         if (lib.isString(field)) {
@@ -116,7 +126,12 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
 
     //mixin related stuff
     function mixinaddmethodser (options, mixin) {
-        return mixin+'.addMethods('+options.name+');'
+        if (lib.isString(mixin)) {
+            return mixin+'.addMethods('+options.name+');'
+        }
+        if (mixin && lib.isString(mixin.name)) {
+            return mixin.name+'.addMethods('+options.name+');'
+        }
     }
     function mixiner (options) {
         var a = 5;
