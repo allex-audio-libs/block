@@ -25,10 +25,22 @@ function createBlockBase (lib, bufferlib, eventlib, mylib) {
         this.currblock = null;
     };
     BlockAttachment.prototype.evaluateEventAndHandler = function (prevblockoutputname, inputname) {
-        var myeventhandlername, prevblockeventname;
+        var prevblockeventname, myeventhandlername;
         var lcfprevblockoutputname;
+        var prevblocktypename, mytypename;
         prevblockoutputname = (prevblockoutputname || '') + '';
         inputname = (inputname || '') + '';
+        prevblocktypename = prevblockoutputname+'Type';
+        mytypename = inputname+'Type';
+        if (!lib.isFunction(this.prevblock[prevblocktypename])) {
+            throw new lib.Error('NO_TYPEGETTER_METHOD', this.prevblock.constructor.name+' does not have the Type Getter method '+prevblocktypename);
+        }
+        if (!lib.isFunction(this.currblock[mytypename])) {
+            throw new lib.Error('NO_TYPEGETTER_METHOD', this.currblock.constructor.name+' does not have the Type Getter method '+mytypename);
+        }
+        if (this.prevblock[prevblocktypename]() !== this.currblock[mytypename]()) {
+            throw new lib.Error('TYPE_MISMATCH', this.prevblock.constructor.name+"'s channel "+prevblockoutputname+' and '+this.currblock.constructor.name+"'s channel "+inputname+' do not match');
+        }
         prevblockeventname = 'has'+prevblockoutputname+'Output';
         myeventhandlername = 'on'+inputname+'Inputer';
         if (!lib.isFunction(this.prevblock[prevblockeventname].attach)) {
