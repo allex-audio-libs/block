@@ -16,7 +16,7 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
             case 'number':
                 return 0;
             case 'string':
-                return '';
+                return "''";
             default:
                 throw new lib.Error('MIXINCHANNEL_TYPE_NOT_SUPPORTED', type+' is not a valid Mixin Channel type');
         }

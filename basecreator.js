@@ -1,8 +1,8 @@
 function createBlockBase (lib, bufferlib, eventlib, mylib) {
     'use strict';
 
-    var VolumeEmitterMixin = mylib.mixins.VolumeEmitter,
-        VolumeListenerMixin = mylib.mixins.VolumeListener;
+    var VolumeEmitterMixin = mylib.mixins.requestChannelMixin('Volume', 'number', true),
+        VolumeListenerMixin = mylib.mixins.requestChannelMixin('Volume', 'number', false);
 
     function BlockAttachment (currblock, prevblock, prevblockoutputname, inputname) {
         this.currblock = currblock;
