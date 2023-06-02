@@ -13,6 +13,6 @@ function createGenerators (execlib, bufferlib, eventlib, timerlib, templateslib,
     require('./noisegeneratorcreator')(lib, mylib);
     //endof generators
 
-    require('./mutatablegeneratorcreator')(lib, mylib);
+    require('./mutatableperiodicgeneratorcreator')(lib, mylib);
 }
 module.exports = createGenerators;
