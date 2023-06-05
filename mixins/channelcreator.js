@@ -21,6 +21,16 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
                 throw new lib.Error('MIXINCHANNEL_TYPE_NOT_SUPPORTED', type+' is not a valid Mixin Channel type');
         }
     }
+    function checkerForType(type) {
+        switch (type) {
+            case 'number':
+                return 'lib.isNumber';
+            case 'string':
+                return "lib.isString";
+            default:
+                throw new lib.Error('MIXINCHANNEL_TYPE_NOT_SUPPORTED', type+' is not a valid Mixin Channel type');
+        }
+    }
 
     function createEmitterMixin (channel, lcchannel, type) {
         var ret;
@@ -35,7 +45,8 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
                 TYPE: channel+'Type',
                 ANNOUNCE: 'announce'+channel+'Output',
                 PARAM: paramTextForType(type),
-                INITIALVALUE: defaultInitValueForType(type)
+                INITIALVALUE: defaultInitValueForType(type),
+                CHECKER: checkerForType(type)
             },
             template: [
                 "function MIXINNAME (initialproperty) {",
@@ -55,7 +66,7 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
                 "    }",
                 "};",
                 "MIXINNAME.prototype.SET = function (PARAM) {",
-                "    if (!lib.isNumber(this.PROPERTY)) {//i.e. am I destroyed?",
+                "    if (!CHECKER(this.PROPERTY)) {//i.e. am I destroyed?",
                 "        return;",
                 "    }",
                 "    this.PROPERTY = PARAM;",
