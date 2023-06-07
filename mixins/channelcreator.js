@@ -38,8 +38,6 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
             replacements: {
                 MIXINNAME: channel+'EmitterMixin',
                 EVENT: 'has'+channel+'Output',
-                INPUT: 'on'+channel+'Input',
-                INPUTER: 'on'+channel+'Inputer',
                 PROPERTY: lcchannel,
                 SET: 'set'+channel,
                 TYPE: channel+'Type',
@@ -51,7 +49,8 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
             template: [
                 "function MIXINNAME (initialproperty) {",
                 "    this.EVENT = new eventlib();",
-                "    this.PROPERTY = initialproperty || INITIALVALUE;",
+                "    this.PROPERTY = INITIALVALUE;",
+                "    this.SET(initialproperty);",
                 "}",
                 "MIXINNAME.prototype.destroy = function () {",
                 "    this.PROPERTY = null;",
@@ -67,6 +66,9 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
                 "};",
                 "MIXINNAME.prototype.SET = function (PARAM) {",
                 "    if (!CHECKER(this.PROPERTY)) {//i.e. am I destroyed?",
+                "        return;",
+                "    }",
+                "    if (this.PROPERTY === PARAM) {",
                 "        return;",
                 "    }",
                 "    this.PROPERTY = PARAM;",
