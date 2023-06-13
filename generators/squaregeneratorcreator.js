@@ -21,8 +21,10 @@ function createSquareGenerator (lib, mylib) {
     SquareGeneratorBlock.prototype.generateSample = function (clockinput) {
         var p = this.period();
         var th = this.periodicClockFromClock(clockinput);
+        var pw = this.pulseWidth;
         var threshold = p*this.pulseWidth;
-        return th <= threshold ? 1 : -1;
+        var ret = (th <= threshold) ? 1 : -1;
+        return ret/2;
     };
 
     mylib.SquareGenerator = SquareGeneratorBlock;

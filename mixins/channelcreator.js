@@ -1,6 +1,8 @@
 function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
     'use strict';
 
+    var channelDescs = new lib.Map();
+
     function paramTextForType(type) {
         switch (type) {
             case 'number':
@@ -32,7 +34,7 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
         }
     }
 
-    function createEmitterMixin (channel, lcchannel, type) {
+    function createEmitterMixin (channel, lcchannel, type, cbm) {
         var ret;
         var evalstr = templateslib.process({
             replacements: {
@@ -68,9 +70,9 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
                 "    if (!CHECKER(this.PROPERTY)) {//i.e. am I destroyed?",
                 "        return;",
                 "    }",
-                "    if (this.PROPERTY === PARAM) {",
-                "        return;",
-                "    }",
+                "    //if (this.PROPERTY === PARAM) {",
+                "        //return;",
+                "    //}",
                 "    this.PROPERTY = PARAM;",
                 "    this.ANNOUNCE(PARAM);",
                 "};",
@@ -90,6 +92,10 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
         });
         eval(evalstr);
         mylib[channel+'Emitter'] = ret;
+        channelDescs.add(channel, {
+            type: type,
+            cbm: cbm
+        });
     }
     function createListenerMixin (channel, lcchannel, type) {
         var ret;
@@ -136,46 +142,85 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
     }
 
 
-    function addTypedMixin (channel, type) {
-        var lcchannel = outerlib.lowerCaseFirst(channel);
-        createEmitterMixin(channel, lcchannel, type);
-        createListenerMixin(channel, lcchannel, type);
+    function addTypedMixinPair (channeldesc) {
+        var lcchannel = outerlib.lowerCaseFirst(channeldesc.name);
+        createEmitterMixin(channeldesc.name, lcchannel, channeldesc.type, channeldesc.cbm);
+        createListenerMixin(channeldesc.name, lcchannel, channeldesc.type);
     }
 
-    function addNumberMixin (channel) {
-        addTypedMixin(channel, 'number');
+    function addAllPassNumberMixinPair (channel) {
+        addTypedMixinPair({
+            name: channel,            
+            type: 'number',
+            cbm: 'allpass'
+        });
+    }
+    function addDiffNumberMixinPair (channel) {
+        addTypedMixinPair({
+            name: channel,            
+            type: 'number',
+            cbm: 'differential'
+        });
     }
 
 
-    addNumberMixin('SampleRate');
-    addNumberMixin('Channels');
-    addNumberMixin('Clock');
-    addNumberMixin('Volume');
-    addNumberMixin('Samples');
-    addNumberMixin('FrequencyHz');
-    addNumberMixin('FrequencyHzModulation');
-    addNumberMixin('Phase');
-    addNumberMixin('PulseWidth');
+    addDiffNumberMixinPair('SampleRate');
+    addDiffNumberMixinPair('Channels');
+    addDiffNumberMixinPair('Clock');
+    addDiffNumberMixinPair('Volume');
+    addAllPassNumberMixinPair('Samples');
+    addDiffNumberMixinPair('FrequencyHz');
+    addDiffNumberMixinPair('FrequencyHzModulation');
+    addDiffNumberMixinPair('Phase');
+    addDiffNumberMixinPair('PulseWidth');
 
-    addNumberMixin('Math');
-    addNumberMixin('Math1');
-    addNumberMixin('Math2');
+    addAllPassNumberMixinPair('Math');
+    addAllPassNumberMixinPair('Math1');
+    addAllPassNumberMixinPair('Math2');
 
     for(var i=0; i<4; i++) {
-        addNumberMixin('Channel'+(i+1));
+        addAllPassNumberMixinPair('Channel'+(i+1));
     }
 
-    addNumberMixin('Resonance');
-    addNumberMixin('FilterSwitchingEnvelope');
+    addDiffNumberMixinPair('Resonance');
+    addDiffNumberMixinPair('FilterSwitchingEnvelope');
 
-    mylib.requestChannelMixin = function (channelname, channeltype, isemitter) {
-        if (arguments.length<3) {
-            throw new lib.Error('MUST_CALL_WITH_3_PARAMS', 'requestChannelMixin must be called with 3 params');
+    mylib.requestChannelMixin = function (reqobj) {
+        if (arguments.length!=1) {
+            throw new lib.Error('MUST_CALL_WITH_1_PARAM', 'requestChannelMixin must be called with just 1 param, the request object');
         }
+        if (!lib.isVal(reqobj)) {
+            throw new lib.Error('MUST_HAVE_REQOBJ', 'The request object for requestChannelMixin must be an object');
+        }
+        if (!lib.isNonEmptyString(reqobj.name)) {
+            throw new lib.Error('REQOBJ_MUST_HAVE_NAME', 'The request object for requestChannelMixin must have a "name"');
+        }
+        if (!lib.isNonEmptyString(reqobj.type)) {
+            throw new lib.Error('REQOBJ_MUST_HAVE_TYPE', 'The request object for requestChannelMixin must have a "type"');
+        }
+        if (!lib.isBoolean(reqobj.emitter)) {
+            throw new lib.Error('REQOBJ_MUST_HAVE_EMITTER', 'The request object for requestChannelMixin must have an "emitter" field [Boolean]');
+        }
+        if (!lib.isNonEmptyString(reqobj.cbm)) {
+            throw new lib.Error('REQOBJ_MUST_HAVE_CBM', 'The request object for requestChannelMixin must have a "cbm", the Change Behavior Model');
+        }
+        var channelname = reqobj.name;
         if (!mylib[channelname+'Emitter']) { //the logic is that if channelname+'Emitter' exists, channelname+'Listener' exists for sure, they always go in pairs
-            addTypedMixin(channelname, channeltype);
+            addTypedMixinPair(reqobj);
         }
-        return mylib[channelname+ ( isemitter ? 'Emitter' : 'Listener' )];
+        //check
+        var checkobj = channelDescs.get(channelname);
+        if (!checkobj) {
+            throw new lib.Error('INTERNAL_ERROR', 'At this point checkobj must have been fully defined.');
+        }
+        if (checkobj.type !== reqobj.type) {
+            throw new lib.Error('REQUEST_TYPE_MISMATCH', 'Channel '+channelname+' was originally created with type '+checkobj.type+' and this request asked for type '+reqobj.type);
+        }
+        if (checkobj.cbm !== reqobj.cbm) {
+            throw new lib.Error('REQUEST_CBM_MISMATCH', 'Channel '+channelname+' was originally created with cbm '+checkobj.cbm+' and this request asked for cbm '+reqobj.cbm);
+        }
+        //endof check
+        return mylib[channelname+ ( reqobj.emitter ? 'Emitter' : 'Listener' )];
     }
 }
 module.exports = createChannelMixins;

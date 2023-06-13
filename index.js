@@ -20,6 +20,8 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
 
     require('./filters')(lib, bufferlib, templateslib, mylib);
 
+    require('./adsr')(lib, bufferlib, eventlib, timerlib, templateslib, mylib);
+
     return mylib;
 }
 

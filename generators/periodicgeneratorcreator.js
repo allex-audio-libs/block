@@ -36,12 +36,14 @@ function createPeriodicGenerator (lib, eventlib, mylib) {
         FrequencyHzEmitterMixin.prototype.destroy.call(this);
         MyBase.prototype.destroy.call(this);
     };
+    PeriodicGeneratorBlock.prototype.physicalFrequency = function () {
+        return this.frequencyHz * (2**(this.frequencyHzModulation));
+    };
     PeriodicGeneratorBlock.prototype.naturalFrequency = function () {
-        var finalfhz = this.frequencyHz * (2**(this.frequencyHzModulation));
-        return finalfhz * 2 * pi;
+        return this.physicalFrequency() * 2 * pi;
     };
     PeriodicGeneratorBlock.prototype.period = function () {
-        return 1/this.frequencyHz;
+        return 1/this.physicalFrequency();
     };
     PeriodicGeneratorBlock.prototype.periodicClockFromClock = function (clock) {
         return clock % this.period();

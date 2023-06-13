@@ -2,8 +2,18 @@ function createMutatableGenerator (lib, mylib) {
     'use strict';
 
     var MyBase = mylib.PeriodicGenerator;
-    var GeneratorTypeEmitterMixin = mylib.mixins.requestChannelMixin('GeneratorType', 'string', true);
-    var GeneratorTypeListenerMixin = mylib.mixins.requestChannelMixin('GeneratorType', 'string', false);
+    var GeneratorTypeEmitterMixin = mylib.mixins.requestChannelMixin({
+        name: 'GeneratorType',
+        type:'string', 
+        cbm: 'differential',
+        emitter: true
+    });
+    var GeneratorTypeListenerMixin = mylib.mixins.requestChannelMixin({
+        name: 'GeneratorType',
+        type:'string', 
+        cbm: 'differential',
+        emitter: false
+    });
     
 
     function MutatablePeriodicGeneratorBlock () {
