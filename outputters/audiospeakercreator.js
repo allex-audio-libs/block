@@ -1,4 +1,4 @@
-var NateSpeaker = require('speaker');
+var Speaker = require('audio-speaker/stream');
 
 function createSpeakerBlock (lib, bufferlib, mylib) {
     'use strict';
@@ -12,7 +12,7 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
 
     function SpeakerBlock () {
         MyBase.call(this);
-        this.nateSpeaker = null;
+        this.audioSpeaker = null;
         this.speakerBusy = false;
         this.myRange = 2**16; //this.nateSpeaker.bitDepth;
         this.signed = null; //this.nateSpeaker.bitDepth == 8 ? true : false;
@@ -24,32 +24,33 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
         this.myWriteMethod = null;
         this.myRange = null;
         this.speakerBusy = null;
-        this.nateSpeaker = null;
+        this.audioSpeaker = null;
         MyBase.prototype.destroy.call(this);
     };
-    SpeakerBlock.prototype.createNate = function () {
+    SpeakerBlock.prototype.createAudioSpeaker = function () {
         if (!(isPositiveNumber(this.channels) && isPositiveNumber(this.sampleRate))) {
             return;
         }
-        if (this.nateSpeaker) {
+        if (this.audioSpeaker) {
             //nateSpeaker has no destroy :/
         }        
-        this.nateSpeaker = null;
+        this.audioSpeaker = null;
         var params = {
             bitDepth: 16,
             channels: this.channels,
-            sampleRate: this.sampleRate
+            sampleRate: this.sampleRate,
+            byteOrder: 'BE'
         };
-        this.nateSpeaker = new NateSpeaker(params);
+        this.audioSpeaker = Speaker(params);
         this.myRange = 2**16-1; //this.nateSpeaker.bitDepth;
-        this.signed = this.nateSpeaker.bitDepth == 8 ? true : false; //whatever Nate meant with this "signed", we'll leave it for now (until proven wrong) like this
+        this.signed = this.audioSpeaker.bitDepth == 8 ? true : false; //whatever Nate meant with this "signed", we'll leave it for now (until proven wrong) like this
         this.signed = true;
-        this.myWriteMethod = (this.signed ? 'Int16' : 'UInt16')+this.nateSpeaker.endianness;
+        this.myWriteMethod = (this.signed ? 'Int16' : 'UInt16')+'LE';
     };
 
     SpeakerBlock.prototype.onSampleRateInput = function (samplerate) {
         SampleRateListenerMixin.prototype.onSampleRateInput.call(this, samplerate);
-        this.createNate();
+        this.createAudioSpeaker();
     };
 
     SpeakerBlock.prototype.convertSampleForOutput = function (input) { //a number in the [-1, 1] range
@@ -63,7 +64,7 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
     var writestart;
     var missed = [];
     SpeakerBlock.prototype.onBufferReady = function (buff) {
-        if (!this.nateSpeaker) {
+        if (!this.audioSpeaker) {
             return;
         }
         if (this.speakerBusy) {
@@ -75,7 +76,7 @@ function createSpeakerBlock (lib, bufferlib, mylib) {
         this.speakerBusy = true;
         writestart = Date.now();
         missed = [];
-        this.nateSpeaker.write(buff, this.onWritten.bind(this));
+        this.audioSpeaker.write(buff, this.onWritten.bind(this));
     };
     SpeakerBlock.prototype.onWritten = function () {
         //console.log(Date.now()-writestart, 'passed', missed, 'missed');

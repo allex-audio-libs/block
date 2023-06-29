@@ -10,6 +10,9 @@ function libCreator(execlib, bufferlib, eventlib, timerlib, templateslib) {
     require('./sampleproducerbasecreator')(lib, bufferlib, eventlib, mylib);
     require('./clockcreator')(lib, timerlib, eventlib, mylib);
     
+    //inputters 
+    require('./inputters')(lib, bufferlib, eventlib, timerlib, templateslib, mylib);
+    //endof inputters 
     //outputters 
     require('./outputters')(lib, bufferlib, eventlib, timerlib, templateslib, mylib);
     //endof outputters 

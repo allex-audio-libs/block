@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "fili": "2.x",
+    "midi": "2.x",
     "speaker": "0.x"
   },
   "keywords": [

@@ -54,39 +54,86 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
     
 
     var MyBase = mylib.SampleProducerBase;
-    var ChannelsEmitterMixin = mylib.mixins.ChannelsEmitter;
-    var ChannelsListenerMixin = mylib.mixins.ChannelsListener;
-    var SampleRateEmitterMixin = mylib.mixins.SampleRateEmitter;
-    var SampleRateListenerMixin = mylib.mixins.SampleRateListener;
+    var ClockListenerMixin = mylib.mixins.requestChannelMixin({
+        name: 'Clock', 
+        type: 'number', 
+        cbm: 'differential',
+        emitter: false
+    });
+    var ChannelsEmitterMixin = mylib.mixins.requestChannelMixin({
+        name: 'Channels', 
+        type: 'number', 
+        cbm: 'differential',
+        emitter: true
+    });
+    var ChannelsListenerMixin = mylib.mixins.requestChannelMixin({
+        name: 'Channels', 
+        type: 'number', 
+        cbm: 'differential',
+        emitter: false
+    });
+    var SampleRateEmitterMixin = mylib.mixins.requestChannelMixin({
+        name: 'SampleRate', 
+        type: 'number', 
+        cbm: 'differential',
+        emitter: true
+    });
+    var SampleRateListenerMixin = mylib.mixins.requestChannelMixin({
+        name: 'SampleRate', 
+        type: 'number', 
+        cbm: 'differential',
+        emitter: false
+    });
+    var URIEmitterMixin = mylib.mixins.requestChannelMixin({
+        name: 'URI', 
+        type: 'string', 
+        cbm: 'differential',
+        emitter: true
+    });
+    var URIListenerMixin = mylib.mixins.requestChannelMixin({
+        name: 'URI', 
+        type: 'string', 
+        cbm: 'differential',
+        emitter: false
+    });
 
     function OutputBaseBlock () {
         MyBase.call(this);
+        ClockListenerMixin.call(this);
         ChannelsEmitterMixin.call(this, 1);
         ChannelsListenerMixin.call(this);
         eval(ctorer());
         SampleRateEmitterMixin.call(this, 0);
         SampleRateListenerMixin.call(this);
-        this.dBuffer = new bufferlib.DoubleNodeJSBuffer(20480, this.onBufferReady.bind(this));
+        URIEmitterMixin.call(this, '');
+        URIListenerMixin.call(this);
+        this.dBuffer = new bufferlib.DoubleNodeJSBuffer(2048, this.onBufferReady.bind(this));
     }
     lib.inherit(OutputBaseBlock, MyBase);
+    ClockListenerMixin.addMethods(OutputBaseBlock);
     ChannelsEmitterMixin.addMethods(OutputBaseBlock);
     ChannelsListenerMixin.addMethods(OutputBaseBlock);
     eval(addMethodser());
     SampleRateEmitterMixin.addMethods(OutputBaseBlock);
     SampleRateListenerMixin.addMethods(OutputBaseBlock);
+    URIEmitterMixin.addMethods(OutputBaseBlock);
+    URIListenerMixin.addMethods(OutputBaseBlock);
     OutputBaseBlock.prototype.destroy = function () {
         if (this.dBuffer) {
             this.dBuffer.destroy();
         }
         this.dBuffer = null;
+        URIListenerMixin.prototype.destroy.call(this);
+        URIEmitterMixin.prototype.destroy.call(this);
         SampleRateListenerMixin.prototype.destroy.call(this);
         SampleRateEmitterMixin.prototype.destroy.call(this);
         eval(destroyer());
         ChannelsListenerMixin.prototype.destroy.call(this);
         ChannelsEmitterMixin.prototype.destroy.call(this);
+        ClockListenerMixin.prototype.destroy.call(this);
         MyBase.prototype.destroy.call(this);
     };
-    eval(onChanneler());
+    //eval(onChanneler());
 
     function onAnyChannelInput (channelindex, sample) {
         if (channelindex<1 || channelindex>this.channels) {
@@ -96,7 +143,7 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
             var a = 5;
         }
         produceSample.call(this, sample);
-    };
+    };    
     function produceSample (input) { //a number in the [-1, 1] range
         if (!this.myWriteMethod) {
             return;
@@ -109,6 +156,12 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
         this.dBuffer.add(this.myWriteMethod, this.convertSampleForOutput(sample));
     };
 
+    OutputBaseBlock.prototype.setClock = function (number) {
+        var ch;
+        for(ch = 0; ch<this.channels; ch++) {
+            produceSample.call(this, this['channel'+(ch+1)]);
+        }
+    };
     
     OutputBaseBlock.prototype.convertSampleForOutput = function (sample) {
         return sample;

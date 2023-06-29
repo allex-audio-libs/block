@@ -16,5 +16,10 @@ function createHelpers (lib, mylib) {
 
     mylib.lowerCaseFirst = lowerCaseFirst;
     mylib.upperCaseFirst = upperCaseFirst;
+
+    function ramp (duration, currentmoment) {
+        return ((duration > 0 ? 0 : 1)+currentmoment*1/duration);
+    }
+    mylib.ramp = ramp;
 }
 module.exports = createHelpers;

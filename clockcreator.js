@@ -6,7 +6,7 @@ function createClockBlock (lib, timerlib, eventlib, mylib) {
     var SampleRateListenerMixin = mylib.mixins.SampleRateListener;
     var ClockEmitterMixin = mylib.mixins.ClockEmitter;
 
-    var _JSClockPeriod = 100;
+    var _JSClockPeriod = 10;
 
     function ClockBlock () {
         MyBase.call(this);

@@ -3,7 +3,7 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
 
     //general helpers
     function methodliner (line) {
-        return '\t'+line+';'
+        return '\t'+line
     }
     //endof general helpers
 
@@ -40,6 +40,7 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
         if (options.ctor.debug) {
             lines.push('\tdebugger;');
         }
+        Array.prototype.push.apply(lines, options.prefields.map(ctorfielder));
         if (options.base) {
             lines.push('\t'+options.base+'.call(this);');
         }
@@ -119,6 +120,7 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
         if (options.base) {
             lines.push('\t'+options.base+'.prototype.destroy.call(this);');
         }
+        namestodestroy = reverseReduce(options.prefields, dtorfielder, []);
         lines.push('};');
         return lines.join('\n');
     }
@@ -181,6 +183,7 @@ function createClassCreator (lib, templateslib, mylib, mixins) {
         options.ctor.params = options.ctor.params||[];
         options.ctor.lines = options.ctor.lines||[];
         options.mixins = options.mixins||[];
+        options.prefields = options.prefields||[];
         options.fields = options.fields||[];
         options.methods = options.methods||[];
         var ret = [

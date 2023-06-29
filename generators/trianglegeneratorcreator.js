@@ -23,11 +23,10 @@ function createTriangleGenerator (lib, mylib) {
         var asctime = p*this.pulseWidth;
         var desctime = p-asctime;
         var currtime = this.periodicClockFromClock(clockinput);
-        var slope = currtime <= asctime ? 1/asctime : -1/desctime;
+        var duration = currtime <= asctime ? asctime : -desctime;
         var time = currtime <= asctime ? currtime : currtime-asctime;
-        var start = currtime <= asctime ? 0 : 1;
         //console.log(this.period(), ret);
-        return -1+2*(start+time*slope);
+        return -1+2*mylib.ramp(duration, time);
     };
 
     mylib.TriangleGenerator = TriangleGeneratorBlock;

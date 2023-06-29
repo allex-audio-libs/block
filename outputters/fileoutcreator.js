@@ -8,14 +8,18 @@ function createFileOutBlock (lib, bufferlib, mylib) {
     function FileOutBlock () {
         MyBase.call(this);
         this.file = null;
-        fs.open('output.raw', 'w', this.onFileOpen.bind(this));
     }
     lib.inherit(FileOutBlock, MyBase);
     FileOutBlock.prototype.destroy = function () {
-        if (this.file) {
-            fs.close(this.file);
-        }
+        purgeFile.call(this);
         MyBase.prototype.destroy.call(this);
+    };
+    FileOutBlock.prototype.announceURIOutput = function (uri) {
+        purgeFile.call(this);
+        if (!uri) {
+            return;
+        }
+        fs.open(uri, 'w', this.onFileOpen.bind(this));
     };
     FileOutBlock.prototype.convertSampleForOutput = function (input) {
         return input * 32200;
@@ -31,6 +35,15 @@ function createFileOutBlock (lib, bufferlib, mylib) {
     FileOutBlock.prototype.onFileOpen = function (error, fd) {
         this.file = error ? null : fd;
     };
+
+    //statics
+    function purgeFile () {
+        if (this.file) {
+            fs.close(this.file);
+        }
+        this.file = null;
+    }
+    //endof statics
 
     FileOutBlock.prototype.myWriteMethod = 'Int16LE';
 

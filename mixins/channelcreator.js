@@ -34,9 +34,27 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
         }
     }
 
+    function setterCBM (cbm) {
+        if (cbm == 'allpass') {
+            return '';
+        }
+        if (cbm == 'differential') {
+            return [
+                "",
+                "    if (this.PROPERTY === PARAM) {",
+                "        return;",
+                "    }",    
+            ].join('\n');
+        }
+        throw new lib.Error('CBM_TYPE_NOT_SUPPORTED', cbm+' is not a valid ChangeBehaviorModel type');
+    }
+
     function createEmitterMixin (channel, lcchannel, type, cbm) {
         var ret;
         var evalstr = templateslib.process({
+            prereplacements: {
+                SETTERCBM: setterCBM(cbm)
+            },
             replacements: {
                 MIXINNAME: channel+'EmitterMixin',
                 EVENT: 'has'+channel+'Output',
@@ -69,10 +87,7 @@ function createChannelMixins (lib, eventlib, templateslib, outerlib, mylib) {
                 "MIXINNAME.prototype.SET = function (PARAM) {",
                 "    if (!CHECKER(this.PROPERTY)) {//i.e. am I destroyed?",
                 "        return;",
-                "    }",
-                "    //if (this.PROPERTY === PARAM) {",
-                "        //return;",
-                "    //}",
+                "    }SETTERCBM",
                 "    this.PROPERTY = PARAM;",
                 "    this.ANNOUNCE(PARAM);",
                 "};",
