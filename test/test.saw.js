@@ -23,6 +23,7 @@ describe('Test Saw', function () {
     it('Connect\'em all', function () {
         Clock.setSampleRate(44100);
         Saw.attachToPreviousBlock(Clock, 'Clock', 'Clock');
+        Speaker.attachToPreviousBlock(Clock, 'Clock', 'Clock');
         Speaker.attachToPreviousBlock(Clock, 'SampleRate', 'SampleRate');
         Speaker.attachToPreviousBlock(Saw, 'Samples', 'Channel1');
     });
@@ -36,6 +37,7 @@ describe('Test Saw', function () {
         expect(Clock.hasClockOutput.listeners.length).to.equal(0);
         Speaker.detachFromPreviousBlock(Saw, 'Samples', 'Channel1');
         Speaker.detachFromPreviousBlock(Clock, 'SampleRate', 'SampleRate');
+        Speaker.detachFromPreviousBlock(Clock, 'Clock', 'Clock');
         expect(Speaker.attachments.length).to.equal(0);
         expect(Saw.hasSamplesOutput.listeners.length).to.equal(0);
     });

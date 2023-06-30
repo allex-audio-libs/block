@@ -33,6 +33,7 @@ describe('Test Complex Sine', function () {
         Sine.attachToPreviousBlock(Clock, 'Clock', 'Clock');
         Sine.attachToPreviousBlock(SlowSine, 'Samples', 'FrequencyHzModulation');
         //Sine.attachToPreviousBlock(SlowSine, 'Samples', 'Volume');
+        Speaker.attachToPreviousBlock(Clock, 'Clock', 'Clock');
         Speaker.attachToPreviousBlock(Clock, 'SampleRate', 'SampleRate');
         Speaker.attachToPreviousBlock(Sine, 'Samples', 'Channel1');
     });
@@ -48,6 +49,7 @@ describe('Test Complex Sine', function () {
         expect(Clock.hasClockOutput.listeners.length).to.equal(0);
         Speaker.detachFromPreviousBlock(Sine, 'Samples', 'Channel1');
         Speaker.detachFromPreviousBlock(Clock, 'SampleRate', 'SampleRate');
+        Speaker.detachFromPreviousBlock(Clock, 'Clock', 'Clock');
         expect(Speaker.attachments.length).to.equal(0);
         expect(Sine.hasSamplesOutput.listeners.length).to.equal(0);
     });

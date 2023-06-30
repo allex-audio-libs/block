@@ -23,6 +23,7 @@ describe('Test Triangle', function () {
     it('Connect\'em all', function () {
         Clock.setSampleRate(44100);
         Triangle.attachToPreviousBlock(Clock, 'Clock', 'Clock');
+        Speaker.attachToPreviousBlock(Clock, 'Clock', 'Clock');
         Speaker.attachToPreviousBlock(Clock, 'SampleRate', 'SampleRate');
         Speaker.attachToPreviousBlock(Triangle, 'Samples', 'Channel1');
     });
@@ -36,6 +37,7 @@ describe('Test Triangle', function () {
         expect(Clock.hasClockOutput.listeners.length).to.equal(0);
         Speaker.detachFromPreviousBlock(Triangle, 'Samples', 'Channel1');
         Speaker.detachFromPreviousBlock(Clock, 'SampleRate', 'SampleRate');
+        Speaker.detachFromPreviousBlock(Clock, 'Clock', 'Clock');
         expect(Speaker.attachments.length).to.equal(0);
         expect(Triangle.hasSamplesOutput.listeners.length).to.equal(0);
     });

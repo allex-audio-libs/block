@@ -18,7 +18,7 @@ function createMathBlock (lib, templateslib, mylib) {
         ClockListenerMixin.call(this);
     }
     lib.inherit(MathBlock, MyBase);
-    ClockListenerMixin.addMethods(UnaryMathBlock);
+    ClockListenerMixin.addMethods(MathBlock);
     MathBlock.prototype.destroy = function () {
         ClockListenerMixin.prototype.destroy.call(this);
         MyBase.prototype.destroy.call(this);

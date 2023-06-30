@@ -8,6 +8,7 @@ function fakeGenerator (clockinput) {
 
 function ourSampleProducer (clockinput) {
     var output = fakeGenerator(clockinput); //in the [-1, 1] range
+    Speaker.onClockInput(clockinput);
     Speaker.onChannel1Input(output);
 }
 
