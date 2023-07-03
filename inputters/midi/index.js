@@ -64,7 +64,10 @@ function createMidiInputter (lib, bufferlib, eventlib, timerlib, templateslib, m
         this.input = null;
     };
     MidiInputBlock.prototype.announceMidiChannelOutput = function (number) {
-        this.input.openPort(0);
+        if (number<0) {
+            return;
+        }
+        this.input.openPort(number);
         this.input.ignoreTypes(false, false, false);
         this.input.on('message', this.myOnMidiInput.bind(this));
         MidiChannelEmitterMixin.prototype.announceMidiChannelOutput.call(this);

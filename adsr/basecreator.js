@@ -119,6 +119,7 @@ function creteADSRBase (lib, bufferlib, eventlib, timerlib, templateslib, mylib)
         RListenerMixin.call(this);
         this.triggeredVolume = 0;
         this.triggered = null;
+        this.releasedVolume = 0;
         this.released = null;
         this.setVolume(0);
     }
@@ -136,6 +137,7 @@ function creteADSRBase (lib, bufferlib, eventlib, timerlib, templateslib, mylib)
     RListenerMixin.addMethods(ADSRBaseBlock);
     ADSRBaseBlock.prototype.destroy = function () {
         this.released = null;
+        this.releasedVolume = null;
         this.triggered = null;
         this.triggeredVolume = null;
         RListenerMixin.call(this);
@@ -178,7 +180,7 @@ function creteADSRBase (lib, bufferlib, eventlib, timerlib, templateslib, mylib)
             }
             if (this.triggered+this.a+this.d > clock) {
                 //d
-                newv = mylib.ramp(-this.d, clock-this.triggered-this.a);
+                newv = (this.s!=1) ? mylib.ramp(-this.d/(1-this.s), clock-this.triggered-this.a) : 1;
                 mySetVolume.call(this, newv);
                 return;
             }
@@ -193,7 +195,11 @@ function creteADSRBase (lib, bufferlib, eventlib, timerlib, templateslib, mylib)
             if (this.released<0) {
                 this.released = clock;
             }
-            if (this.released+this.r < clock) {
+            if (this.released+this.r > clock) {
+                newv = this.releasedVolume * mylib.ramp(-this.r, clock-this.released);
+                mySetVolume.call(this, newv);
+            }
+            if (this.volume <=0) {
                 this.setVolume(0);
                 this.released = null;
             }
@@ -210,6 +216,7 @@ function creteADSRBase (lib, bufferlib, eventlib, timerlib, templateslib, mylib)
         this.released = null;
     };
     ADSRBaseBlock.prototype.handleTriggerOff = function () {
+        this.releasedVolume = this.volume;
         this.triggered = null;
         this.released = -1;
     };
