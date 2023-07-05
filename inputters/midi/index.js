@@ -4,25 +4,32 @@ function createMidiInputter (lib, bufferlib, eventlib, timerlib, templateslib, m
     'use strict';
 
     var MyBase = mylib.Base;
+    function anyMixinDescriptor (mastername, index) {
+        var name = mastername + (index>0 ? index+'' : '');
+        return {
+            name: name, 
+            type: 'number', 
+            cbm: 'differential',
+            emitter: true
+        };
+    }
+    function triggerMixinDescriptor (index) {
+        return anyMixinDescriptor('Trigger', index);
+    }
+    function pitchMixinDescriptor (index) {
+        return anyMixinDescriptor('Pitch', index);
+    }
+    function velocityMixinDescriptor (index) {
+        return anyMixinDescriptor('Velocity', index);
+    }
+    function frequencyHzMixinDescriptor (index) {
+        return anyMixinDescriptor('FrequencyHz', index);
+    }
 
-    var TriggerEmitterMixin = mylib.mixins.requestChannelMixin({
-        name: 'Trigger', 
-        type: 'number', 
-        cbm: 'differential',
-        emitter: true
-    });
-    var PitchEmitterMixin = mylib.mixins.requestChannelMixin({
-        name: 'Pitch', 
-        type: 'number', 
-        cbm: 'differential',
-        emitter: true
-    });
-    var FrequencyHzEmitterMixin = mylib.mixins.requestChannelMixin({
-        name: 'FrequencyHz', 
-        type: 'number', 
-        cbm: 'differential',
-        emitter: true
-    });
+    var TriggerEmitterMixin = mylib.mixins.requestChannelMixin(triggerMixinDescriptor(0));
+    var PitchEmitterMixin = mylib.mixins.requestChannelMixin(pitchMixinDescriptor(0));
+    var VelocityEmitterMixin = mylib.mixins.requestChannelMixin(velocityMixinDescriptor(0));
+    var FrequencyHzEmitterMixin = mylib.mixins.requestChannelMixin(frequencyHzMixinDescriptor(0));
     var MidiChannelEmitterMixin = mylib.mixins.requestChannelMixin({
         name: 'MidiChannel', 
         type: 'number', 
@@ -36,25 +43,95 @@ function createMidiInputter (lib, bufferlib, eventlib, timerlib, templateslib, m
         emitter: false
     });
 
+    function channelProducer (channelcount, func, descending) {
+        var ret = [];
+        var i;
+        if (descending) {
+            for (i=channelcount-1; i>=0; i--) {
+                ret.push(func(i+1));
+            }
+            return ret;
+        }
+        for (i=0; i<channelcount; i++) {
+            ret.push(func(i+1));
+        }
+        return ret;
+    }
+    function channelTemplater (channelcount, func, descending) {
+        var ret = templateslib.process({
+            template: channelProducer(channelcount, func, descending).join(''),
+            replacements: {}
+        });
+        return ret;
+    }
+
+    var _CHANNELCOUNT = 8;
+    var polymixins = [{
+        t: TriggerEmitterMixin,
+        p: PitchEmitterMixin,
+        v: VelocityEmitterMixin,
+        f: FrequencyHzEmitterMixin
+    }];
+    var channeldeclarationstring = channelTemplater(_CHANNELCOUNT, function (index) {
+        return [
+            'polymixins['+index+'] = {',
+            '\tt: mylib.mixins.requestChannelMixin(triggerMixinDescriptor('+index+')),',
+            '\tp: mylib.mixins.requestChannelMixin(pitchMixinDescriptor('+index+')),',
+            '\tv: mylib.mixins.requestChannelMixin(velocityMixinDescriptor('+index+')),',
+            '\tf: mylib.mixins.requestChannelMixin(frequencyHzMixinDescriptor('+index+'))',
+            '};\n'
+        ].join('\n');
+    });
+    eval(channeldeclarationstring);
+
     function MidiInputBlock () {
         this.input = new midi.Input();
         MyBase.call(this);
         MidiChannelEmitterMixin.call(this, -1);
         MidiChannelListenerMixin.call(this);
-        TriggerEmitterMixin.call(this, 0);
-        PitchEmitterMixin.call(this, -1);
-        FrequencyHzEmitterMixin.call(this, -1);
+        polymixins[0].t.call(this, 0);
+        polymixins[0].p.call(this, -1);
+        polymixins[0].v.call(this, -1);
+        polymixins[0].f.call(this, -1);
+        eval(channelTemplater(_CHANNELCOUNT, function (index) {
+            return [
+                'polymixins['+index+'].t.call(this, 0);',
+                'polymixins['+index+'].p.call(this, -1);',
+                'polymixins['+index+'].v.call(this, -1);',
+                'polymixins['+index+'].f.call(this, -1);',
+            ].join('\n');
+        }));
+        this.polyChannels=new Array(_CHANNELCOUNT);
     }
     lib.inherit(MidiInputBlock, MyBase);
     MidiChannelEmitterMixin.addMethods(MidiInputBlock);
     MidiChannelListenerMixin.addMethods(MidiInputBlock);
-    TriggerEmitterMixin.addMethods(MidiInputBlock);
-    PitchEmitterMixin.addMethods(MidiInputBlock);
-    FrequencyHzEmitterMixin.addMethods(MidiInputBlock);
+    polymixins[0].t.addMethods(MidiInputBlock);
+    polymixins[0].p.addMethods(MidiInputBlock);
+    polymixins[0].v.addMethods(MidiInputBlock);
+    polymixins[0].f.addMethods(MidiInputBlock);
+    eval(channelTemplater(_CHANNELCOUNT, function (index) {
+        return [
+            'polymixins['+index+'].t.addMethods(MidiInputBlock);',
+            'polymixins['+index+'].p.addMethods(MidiInputBlock);',
+            'polymixins['+index+'].v.addMethods(MidiInputBlock);',
+            'polymixins['+index+'].f.addMethods(MidiInputBlock);',
+        ].join('\n');
+    }));
     MidiInputBlock.prototype.destroy = function () {
-        FrequencyHzEmitterMixin.prototype.destroy.call(this);
-        PitchEmitterMixin.prototype.destroy.call(this);
-        TriggerEmitterMixin.prototype.destroy.call(this);
+        this.polyChannels = null;
+        eval(channelTemplater(_CHANNELCOUNT, function (index) {
+            return [
+                'polymixins['+index+'].f.prototype.destroy.call(this);',
+                'polymixins['+index+'].v.prototype.destroy.call(this);',
+                'polymixins['+index+'].p.prototype.destroy.call(this);',
+                'polymixins['+index+'].t.prototype.destroy.call(this);',
+            ].join('\n');
+        }, true));
+        polymixins[0].f.prototype.destroy.call(this);
+        polymixins[0].v.prototype.destroy.call(this);
+        polymixins[0].p.prototype.destroy.call(this);
+        polymixins[0].t.prototype.destroy.call(this);
         MidiChannelListenerMixin.prototype.destroy.call(this);
         MidiChannelEmitterMixin.prototype.destroy.call(this);
         Base.prototype.destroy.call(this);
@@ -74,20 +151,64 @@ function createMidiInputter (lib, bufferlib, eventlib, timerlib, templateslib, m
     };
 
     MidiInputBlock.prototype.myOnMidiInput = function (deltatime, midimessage) {
+        var freechannel;
         if (!lib.isArray(midimessage)) {
             return;
         }
         if (midimessage.length == 3) {
-            if (midimessage[0] == 128) {
-                this.setTrigger(0);
+            //this.doPoly(midimessage);
+            this.doOutput(0, midimessage[0], midimessage[1], midimessage[2]);
+            //freechannel = this.freeChannelFor(midimessage[0], midimessage[1], midimessage[2])
+            freechannel = this.channelFor.apply(this, midimessage);
+            if (freechannel>0 && freechannel<=_CHANNELCOUNT) {
+                this.doOutput(freechannel, midimessage[0], midimessage[1], midimessage[2]);
             }
-            if (midimessage[0] == 144) {
-                this.setTrigger(1);
-            }
-            this.setPitch(midimessage[1]);
-            this.setFrequencyHz(pitch2frequencyhz[midimessage[1]] || 440);
         }
     };
+
+    MidiInputBlock.prototype.doOutput = function (channel, trigger, pitch, velocity) {        
+        if (trigger == 128) {
+            this.setForOutput(channel, 'Trigger', 0);
+        }
+        if (trigger == 144) {
+            this.setForOutput(channel, 'Trigger', 1);
+        }
+        this.setForOutput(channel, 'Pitch', pitch);
+        this.setForOutput(channel, 'FrequencyHz', pitch2frequencyhz[pitch] || 440);
+        this.setForOutput(channel, 'Velocity', velocity/100);
+    };
+    MidiInputBlock.prototype.setForOutput = function (outchannel, channel, param) {
+        var mymethodname = outchannel>0 ? 'set'+channel+''+outchannel : 'set'+channel;
+        this[mymethodname](param);
+    };
+    MidiInputBlock.prototype.channelFor = function (trigger, pitch, velocity) {
+        var ret;
+        if (trigger == 144) {//key down, find an empty channel
+            ret = firstempty(this.polyChannels);
+            if (ret>=0) {
+                this.polyChannels[ret] = pitch;
+            }
+            return ret+1;
+        }
+        if (trigger == 128) {//key up, find the channel with pitch
+            ret = this.polyChannels.indexOf(pitch);
+            if (ret>=0) {
+                this.polyChannels[ret] = null;
+            }
+            return ret+1;
+        }
+    };
+    MidiInputBlock.channelCount = _CHANNELCOUNT;
+    
+    function firstempty (arry) {
+        var i;
+        for (i=0; i<arry.length; i++) {
+            if (!lib.isVal(arry[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
 
     var pitch2frequencyhz = [
