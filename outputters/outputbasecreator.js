@@ -96,6 +96,12 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
         cbm: 'differential',
         emitter: false
     });
+    var ClipEmitterMixin = mylib.mixins.requestChannelMixin({
+        name: 'Clip', 
+        type: 'number', 
+        cbm: 'differential',
+        emitter: true
+    });
 
     function OutputBaseBlock () {
         MyBase.call(this);
@@ -107,6 +113,7 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
         SampleRateListenerMixin.call(this);
         URIEmitterMixin.call(this, '');
         URIListenerMixin.call(this);
+        ClipEmitterMixin.call(this, 0);
         this.dBuffer = new bufferlib.DoubleNodeJSBuffer(2048, this.onBufferReady.bind(this));
     }
     lib.inherit(OutputBaseBlock, MyBase);
@@ -118,11 +125,13 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
     SampleRateListenerMixin.addMethods(OutputBaseBlock);
     URIEmitterMixin.addMethods(OutputBaseBlock);
     URIListenerMixin.addMethods(OutputBaseBlock);
+    ClipEmitterMixin.addMethods(OutputBaseBlock);
     OutputBaseBlock.prototype.destroy = function () {
         if (this.dBuffer) {
             this.dBuffer.destroy();
         }
         this.dBuffer = null;
+        ClipEmitterMixin.prototype.destroy.call(this);
         URIListenerMixin.prototype.destroy.call(this);
         URIEmitterMixin.prototype.destroy.call(this);
         SampleRateListenerMixin.prototype.destroy.call(this);
@@ -153,7 +162,7 @@ function createOutputBaseBlock (lib, bufferlib, templateslib, mylib) {
     };
     function writeSampleToBuffer (sample) {
         //myWriteMethod is not defined in this base class at all, it is left to the children
-        this.dBuffer.add(this.myWriteMethod, this.convertSampleForOutput(sample));
+        this.setClip(this.dBuffer.add(this.myWriteMethod, this.convertSampleForOutput(sample)));
     };
 
     OutputBaseBlock.prototype.setClock = function (number) {
